@@ -26,11 +26,12 @@ function DashboardIndex() {
     }
 
     return (
-        <div>
-            <h2 className="mb-4 text-3xl font-bold tracking-tight">
-                Dashboard
-            </h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-4">
+            <div>
+                <h2 className="text-xl font-bold tracking-tight">Dashboard</h2>
+                <p className="text-muted-foreground">An overview of your pharmacy's performance.</p>
+            </div>
+            <div className="mx-auto grid w-full max-w-6xl gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
@@ -42,7 +43,7 @@ function DashboardIndex() {
                         {isLoading ? (
                             <Skeleton className="h-8 w-3/4" />
                         ) : (
-                            <div className="text-2xl font-bold">
+                            <div className="text-xl font-bold">
                                 ${data?.total_sales_today ?? "0.00"}
                             </div>
                         )}
@@ -62,7 +63,7 @@ function DashboardIndex() {
                         {isLoading ? (
                             <Skeleton className="h-8 w-1/2" />
                         ) : (
-                            <div className="text-2xl font-bold">
+                            <div className="text-xl font-bold">
                                 {data?.total_medicines ?? 0}
                             </div>
                         )}
@@ -82,7 +83,7 @@ function DashboardIndex() {
                         {isLoading ? (
                             <Skeleton className="h-8 w-1/2" />
                         ) : (
-                            <div className="text-2xl font-bold">
+                            <div className="text-xl font-bold">
                                 {data?.low_stock_items_count ?? 0}
                             </div>
                         )}

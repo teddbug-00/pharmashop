@@ -12,9 +12,9 @@ import React from "react"
 import { useAuth } from "@/hooks/use-auth"
 
 export function MainNav({
-                            className,
-                            ...props
-                        }: React.HTMLAttributes<HTMLElement>) {
+    className,
+    ...props
+}: React.HTMLAttributes<HTMLElement>) {
     const { user } = useAuth()
 
     return (
@@ -49,7 +49,7 @@ export function MainNav({
                             <NavigationMenuLink
                                 className={navigationMenuTriggerStyle()}
                             >
-                                Medicines
+                                Inventory
                             </NavigationMenuLink>
                         </Link>
                     </NavigationMenuItem>

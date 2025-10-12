@@ -149,23 +149,25 @@ function MedicinesComponent() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">
-                        Inventory
-                    </h2>
-                    <p className="text-muted-foreground">
-                        Manage all medicines in your inventory.
-                    </p>
+        <div className="space-y-4">
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h2 className="text-xl font-bold tracking-tight">
+                            Inventory
+                        </h2>
+                        <p className="text-muted-foreground">
+                            Manage all medicines in your inventory.
+                        </p>
+                    </div>
+                    <Button size="sm">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add Medicine
+                    </Button>
                 </div>
-                <Button>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Medicine
-                </Button>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mx-auto grid w-full max-w-6xl gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
@@ -177,7 +179,7 @@ function MedicinesComponent() {
                         {isLoadingMedicines ? (
                             <Skeleton className="h-8 w-1/2" />
                         ) : (
-                            <div className="text-2xl font-bold">
+                            <div className="text-xl font-bold">
                                 {medicinesData?.length ?? 0}
                             </div>
                         )}
@@ -194,7 +196,7 @@ function MedicinesComponent() {
                         {isLoadingLowStock ? (
                             <Skeleton className="h-8 w-1/2" />
                         ) : (
-                            <div className="text-2xl font-bold">{lowStockCount ?? 0}</div>
+                            <div className="text-xl font-bold">{lowStockCount ?? 0}</div>
                         )}
                     </CardContent>
                 </Card>
@@ -209,7 +211,7 @@ function MedicinesComponent() {
                         {isLoadingExpiring ? (
                             <Skeleton className="h-8 w-1/2" />
                         ) : (
-                            <div className="text-2xl font-bold">{expiringSoonCount ?? 0}</div>
+                            <div className="text-xl font-bold">{expiringSoonCount ?? 0}</div>
                         )}
                     </CardContent>
                 </Card>
