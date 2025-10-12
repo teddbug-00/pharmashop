@@ -77,8 +77,7 @@ const columns: ColumnDef<Sale>[] = [
     },
     {
         id: "actions",
-        cell: ({ row }) => {
-            const sale = row.original
+        cell: () => {
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -106,7 +105,7 @@ export const Route = createFileRoute("/_authenticated/sales")({
 function SalesComponent() {
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ["sales"],
-        queryFn: getSales,
+        queryFn: () => getSales(),
     })
 
     if (isError) {

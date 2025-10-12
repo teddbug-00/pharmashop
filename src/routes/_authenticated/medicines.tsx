@@ -131,7 +131,7 @@ export const Route = createFileRoute("/_authenticated/medicines")({
 function MedicinesComponent() {
     const { data: medicinesData, isLoading: isLoadingMedicines, isError, error } = useQuery({
         queryKey: ["medicines"],
-        queryFn: getMedicines,
+        queryFn: () => getMedicines(),
     })
 
     const { data: lowStockCount, isLoading: isLoadingLowStock } = useQuery({

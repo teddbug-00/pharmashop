@@ -64,15 +64,15 @@ export function NewSaleDialog() {
 
     const { data: medicines } = useQuery({
         queryKey: ["medicines"],
-        queryFn: getMedicines,
+        queryFn: () => getMedicines(), // Correctly wrap the function call
         enabled: isDialogOpen, // Only fetch medicines when the dialog is open
     })
 
     const createSaleMutation = useMutation({
         mutationFn: createSale,
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ["sales"]})
-            queryClient.invalidateQueries({queryKey: ["dashboard"]})  // Invalidate dashboard stats too
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({queryKey: ["sales"]})
+            await queryClient.invalidateQueries({queryKey: ["dashboard"]})  // Invalidate dashboard stats too
             setIsDialogOpen(false)
             // Reset state for next time
             setSaleItems([])
@@ -154,7 +154,7 @@ export function NewSaleDialog() {
             })),
             payment_method: paymentMethod,
         }
-        createSaleMutation.mutate(saleToCreate as any) // Using 'as any' until schema is updated
+        createSaleMutation.mutate(saleToCreate)
     }
 
     const totalAmount = saleItems.reduce(
@@ -196,7 +196,7 @@ export function NewSaleDialog() {
                                         <CommandList>
                                             <CommandEmpty>No medicine found.</CommandEmpty>
                                             <CommandGroup>
-                                                {medicines?.map((medicine) => (
+                                                {medicines?.map((medicine: Medicine) => (
                                                     <CommandItem
                                                         key={medicine.id}
                                                         value={medicine.name}

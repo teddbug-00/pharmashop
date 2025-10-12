@@ -1,8 +1,11 @@
 import api from "./client"
-import type { components } from "./schema"
+import type { components, paths } from "./schema"
 
 type SaleInList = components["schemas"]["SaleInList"]
-type SaleCreate = components["schemas"]["SaleCreate"]
+// This type will need to be updated in your schema.d.ts when the backend changes
+type SaleCreateWithPayment = paths["/sales/"]["post"]["requestBody"]["content"]["application/json"]["schema"] & {
+    payment_method?: "cash" | "mobile_money"
+}
 
 export const getSales = async (
     skip: number = 0,
@@ -14,7 +17,7 @@ export const getSales = async (
     return response.data
 }
 
-export const createSale = async (sale: SaleCreate) => {
+export const createSale = async (sale: SaleCreateWithPayment) => {
     const { data } = await api.post("/sales/", sale)
     return data
 }
