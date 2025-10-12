@@ -11,7 +11,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
+    DropdownMenuLabel, DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -21,7 +21,17 @@ type Sale = components["schemas"]["SaleInList"]
 const columns: ColumnDef<Sale>[] = [
     {
         accessorKey: "id",
-        header: "Sale ID",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Sale ID
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
     },
     {
         accessorKey: "sale_date",
@@ -38,7 +48,7 @@ const columns: ColumnDef<Sale>[] = [
         },
         cell: ({ row }) => {
             const date = new Date(row.getValue("sale_date"))
-            return <div>{date.toLocaleString()}</div>
+            return <div>{date.toLocaleDateString()}</div>
         },
     },
     {
@@ -77,6 +87,7 @@ const columns: ColumnDef<Sale>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem>View Sale Details</DropdownMenuItem>
                         <DropdownMenuItem>Print Receipt</DropdownMenuItem>
                     </DropdownMenuContent>
