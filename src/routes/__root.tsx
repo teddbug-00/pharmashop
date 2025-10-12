@@ -8,6 +8,8 @@ import { TanStackRouterDevtools } from "@tanstack/router-devtools"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { AuthProvider, useAuth } from "@/hooks/use-auth"
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 
 const queryClient = new QueryClient()
 
@@ -22,11 +24,17 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootComponent() {
     return (
-        <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-                <RouterUpdater />
-            </AuthProvider>
-        </QueryClientProvider>
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+        >
+            <QueryClientProvider client={queryClient}>
+                <AuthProvider>
+                    <RouterUpdater />
+                </AuthProvider>
+            </QueryClientProvider>
+        </ThemeProvider>
     )
 }
 
@@ -48,6 +56,7 @@ function RouterUpdater() {
     return (
         <>
             <Outlet />
+            <Toaster />
             <TanStackRouterDevtools initialIsOpen={false} />
             <ReactQueryDevtools initialIsOpen={false} />
         </>

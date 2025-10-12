@@ -4,17 +4,19 @@ import { getSales } from "@/lib/api/sales"
 import type { components } from "@/lib/api/schema"
 import { DataTable } from "@/components/data-table"
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal, PlusCircle } from "lucide-react"
+import { ArrowUpDown, MoreHorizontal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel, DropdownMenuSeparator,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
+import { NewSaleDialog } from "@/components/new-sale-dialog"
 
 type Sale = components["schemas"]["SaleInList"]
 
@@ -120,10 +122,7 @@ function SalesComponent() {
                         View and manage all sales transactions.
                     </p>
                 </div>
-                <Button size="sm">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    New Sale
-                </Button>
+                <NewSaleDialog />
             </div>
             {isLoading ? (
                 <div className="space-y-4">
