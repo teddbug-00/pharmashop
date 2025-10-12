@@ -9,11 +9,14 @@ import {
 } from "@/components/ui/navigation-menu"
 import { Pill } from "lucide-react"
 import React from "react"
+import { useAuth } from "@/hooks/use-auth"
 
 export function MainNav({
                             className,
                             ...props
                         }: React.HTMLAttributes<HTMLElement>) {
+    const { user } = useAuth()
+
     return (
         <div className="flex items-center gap-6 text-sm" {...props}>
             <Link to="/" className="flex items-center gap-2 font-semibold">
@@ -64,20 +67,22 @@ export function MainNav({
                             </NavigationMenuLink>
                         </Link>
                     </NavigationMenuItem>
-                    <NavigationMenuItem>
-                        <Link
-                            to="/users"
-                            activeProps={{
-                                className: "bg-accent text-accent-foreground",
-                            }}
-                        >
-                            <NavigationMenuLink
-                                className={navigationMenuTriggerStyle()}
+                    {user?.role === "admin" && (
+                        <NavigationMenuItem>
+                            <Link
+                                to="/users"
+                                activeProps={{
+                                    className: "bg-accent text-accent-foreground",
+                                }}
                             >
-                                Users
-                            </NavigationMenuLink>
-                        </Link>
-                    </NavigationMenuItem>
+                                <NavigationMenuLink
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    Users
+                                </NavigationMenuLink>
+                            </Link>
+                        </NavigationMenuItem>
+                    )}
                 </NavigationMenuList>
             </NavigationMenu>
         </div>

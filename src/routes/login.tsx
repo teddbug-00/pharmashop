@@ -1,15 +1,28 @@
-import {createFileRoute, useNavigate} from '@tanstack/react-router'
-import type {components} from "@/lib/api/schema";
-import {z} from "zod";
-import { useAuth } from "@/hooks/use-auth";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {useMutation} from "@tanstack/react-query";
-import api from "@/lib/api/client.ts";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import {FormField, Form, FormItem, FormLabel, FormControl, FormMessage} from "@/components/ui/form.tsx";
-import {Input} from "@/components/ui/input.tsx";
-import {Button} from "@/components/ui/button.tsx";
+import {createFileRoute} from "@tanstack/react-router";
+import type { components } from "@/lib/api/schema"
+import { z } from "zod"
+import { useAuth } from "@/hooks/use-auth"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation } from "@tanstack/react-query"
+import api from "@/lib/api/client"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 type Token = components["schemas"]["Token"]
 const formSchema = z.object({
@@ -24,7 +37,6 @@ export const Route = createFileRoute("/login")({
 
 function LoginComponent() {
     const auth = useAuth()
-    const navigate = useNavigate()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -49,15 +61,17 @@ function LoginComponent() {
             return res.data
         },
         onSuccess: (data) => {
-            // This is a placeholder. In a real app, you'd fetch the user's
-            // details from a '/users/me' endpoint after getting the token.
-            // For now, we'll create a mock user object.
-            const mockUser = {
-                id: 1,
+            // Create a sample user object, as you suggested.
+            // We'll assume the role is 'admin' for now to test admin features.
+            // When your backend is updated, this object will be replaced
+            // with the real user data from the API response.
+            const userToLogin = {
+                id: 1, // The schema requires an ID, so we'll add a placeholder
                 username: form.getValues("username"),
-                role: "admin", // Assuming admin for now
+                role: "admin" as const, // Hardcode to 'admin' for testing
             }
-            auth.login(data.access_token, mockUser)
+
+            auth.login(data.access_token, userToLogin)
         },
         onError: (error) => {
             // You can handle login errors here, e.g., show a toast notification
@@ -90,7 +104,7 @@ function LoginComponent() {
                             <FormField
                                 control={form.control}
                                 name="username"
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Username</FormLabel>
                                         <FormControl>
@@ -99,14 +113,14 @@ function LoginComponent() {
                                                 {...field}
                                             />
                                         </FormControl>
-                                        <FormMessage/>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
                             <FormField
                                 control={form.control}
                                 name="password"
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Password</FormLabel>
                                         <FormControl>
@@ -116,7 +130,7 @@ function LoginComponent() {
                                                 {...field}
                                             />
                                         </FormControl>
-                                        <FormMessage/>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -141,4 +155,3 @@ function LoginComponent() {
         </div>
     )
 }
-
