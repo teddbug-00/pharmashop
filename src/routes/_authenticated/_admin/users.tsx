@@ -4,19 +4,13 @@ import { getUsers } from "@/lib/api/users"
 import type { components } from "@/lib/api/schema"
 import { DataTable } from "@/components/data-table"
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal, PlusCircle } from "lucide-react"
+import { ArrowUpDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
+import { NewUserDialog } from "@/components/new-user-dialog"
+import { UserActions } from "@/components/user-actions"
 
 type User = components["schemas"]["UserPublic"]
 
@@ -53,25 +47,9 @@ const columns: ColumnDef<User>[] = [
     },
     {
         id: "actions",
-        cell: () => {
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>Edit User</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                            Delete User
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
+        cell: ({ row }) => {
+            const user = row.original
+            return <UserActions user={user} />
         },
     },
 ]
@@ -99,10 +77,7 @@ function UsersComponent() {
                         View and manage system users.
                     </p>
                 </div>
-                <Button size="sm">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    New User
-                </Button>
+                <NewUserDialog />
             </div>
             {isLoading ? (
                 <div className="space-y-4">
