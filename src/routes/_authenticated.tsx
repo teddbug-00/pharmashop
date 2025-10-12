@@ -1,6 +1,9 @@
-import {createFileRoute, Outlet, redirect} from "@tanstack/react-router";
-import {MainNav} from "@/components/main-nav.tsx";
-import {UserNav} from "@/components/user-nav.tsx";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
+import { AppSidebar } from "@/components/app-sidebar"
+import {
+    SidebarProvider,
+    SidebarTrigger,
+} from "@/components/ui/sidebar"
 
 export const Route = createFileRoute("/_authenticated")({
     beforeLoad: ({ context, location }) => {
@@ -19,16 +22,14 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthenticatedLayout() {
     return (
-        <div className="flex min-h-screen w-full flex-col">
-            <header className="sticky top-0 z-40 w-full border-b bg-background">
-                <div className="container flex h-16 items-center justify-between">
-                    <MainNav />
-                    <UserNav />
-                </div>
-            </header>
-            <main className="container flex-1 p-4 md:p-8">
-                <Outlet />
-            </main>
-        </div>
+        <SidebarProvider>
+            <div className="flex min-h-screen">
+                <AppSidebar />
+                <main className="flex-1 p-4 md:p-6">
+                    <SidebarTrigger className="md:hidden" />
+                    <Outlet />
+                </main>
+            </div>
+        </SidebarProvider>
     )
 }

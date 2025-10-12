@@ -1,10 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import { getMedicines } from "@/lib/api/medicines"
+import { getExpiringSoonCount, getLowStockCount } from "@/lib/api/dashboard"
 import type { components } from "@/lib/api/schema"
 import { DataTable } from "@/components/data-table"
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import {
+    AlertTriangle,
+    ArrowUpDown,
+    Clock,
+    MoreHorizontal,
+    Package,
+    PlusCircle,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,6 +23,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
 type Medicine = components["schemas"]["MedicineInList"]
@@ -115,9 +129,19 @@ export const Route = createFileRoute("/_authenticated/medicines")({
 })
 
 function MedicinesComponent() {
-    const { data, isLoading, isError, error } = useQuery({
+    const { data: medicinesData, isLoading: isLoadingMedicines, isError, error } = useQuery({
         queryKey: ["medicines"],
         queryFn: getMedicines,
+    })
+
+    const { data: lowStockCount, isLoading: isLoadingLowStock } = useQuery({
+        queryKey: ["lowStockCount"],
+        queryFn: () => getLowStockCount(10), // Threshold of 10
+    })
+
+    const { data: expiringSoonCount, isLoading: isLoadingExpiring } = useQuery({
+        queryKey: ["expiringSoonCount"],
+        queryFn: () => getExpiringSoonCount(30), // Expiring in next 30 days
     })
 
     if (isError) {
@@ -125,18 +149,81 @@ function MedicinesComponent() {
     }
 
     return (
-        <div className="container mx-auto py-10">
-            <h1 className="text-2xl font-bold mb-4">Medicines Inventory</h1>
-            {isLoading ? (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight">
+                        Inventory
+                    </h2>
+                    <p className="text-muted-foreground">
+                        Manage all medicines in your inventory.
+                    </p>
+                </div>
+                <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Add Medicine
+                </Button>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Total Products
+                        </CardTitle>
+                        <Package className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        {isLoadingMedicines ? (
+                            <Skeleton className="h-8 w-1/2" />
+                        ) : (
+                            <div className="text-2xl font-bold">
+                                {medicinesData?.length ?? 0}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Low Stock
+                        </CardTitle>
+                        <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        {isLoadingLowStock ? (
+                            <Skeleton className="h-8 w-1/2" />
+                        ) : (
+                            <div className="text-2xl font-bold">{lowStockCount ?? 0}</div>
+                        )}
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Expiring Soon
+                        </CardTitle>
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        {isLoadingExpiring ? (
+                            <Skeleton className="h-8 w-1/2" />
+                        ) : (
+                            <div className="text-2xl font-bold">{expiringSoonCount ?? 0}</div>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+
+            {isLoadingMedicines ? (
                 <div className="space-y-4">
-                    <Skeleton className="h-12 w-full" />
-                    <Skeleton className="h-12 w-full" />
-                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-10 w-1/4" />
+                    <Skeleton className="h-[400px] w-full" />
                 </div>
             ) : (
                 <DataTable
                     columns={columns}
-                    data={data ?? []}
+                    data={medicinesData ?? []}
                     filterColumnId="name"
                     filterColumnPlaceholder="Filter by name..."
                 />
