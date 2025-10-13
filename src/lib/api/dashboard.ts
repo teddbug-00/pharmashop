@@ -4,7 +4,10 @@ import type { components } from "./schema"
 type DashboardStats = components["schemas"]["DashboardStats"]
 type MedicineInList = components["schemas"]["MedicineInList"]
 type ExpiringBatchItem = components["schemas"]["ExpiringBatchItem"]
-
+interface DashboardStats {
+    // This field is missing in the openapi.json but is needed for the UI
+    expiring_soon_items_count?: number
+}
 export const getDashboardStats = async (): Promise<DashboardStats> => {
     const response = await api.get<DashboardStats>("/dashboard/stats")
     return response.data
