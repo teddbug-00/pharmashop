@@ -96,24 +96,26 @@ function DashboardPage() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
-                        <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        {isLoadingStats ? (
-                            <Skeleton className="h-8 w-1/2" />
-                        ) : (
-                            <div className="text-2xl font-bold">
-                                {statsData?.low_stock_items_count ?? 0}
-                            </div>
-                        )}
-                        <p className="text-xs text-muted-foreground">
-                            Items below stock threshold
-                        </p>
-                    </CardContent>
-                </Card>
+                <Link to="/reports/low-stock">
+                    <Card className="hover:bg-muted/50 transition-colors">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
+                            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            {isLoadingStats ? (
+                                <Skeleton className="h-8 w-1/2" />
+                            ) : (
+                                <div className="text-2xl font-bold">
+                                    {statsData?.low_stock_items_count ?? 0}
+                                </div>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                                Items below stock threshold
+                            </p>
+                        </CardContent>
+                    </Card>
+                </Link>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">

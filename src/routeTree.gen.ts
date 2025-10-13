@@ -15,6 +15,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSalesRouteImport } from './routes/_authenticated/sales'
 import { Route as AuthenticatedMedicinesRouteImport } from './routes/_authenticated/medicines'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/_admin'
+import { Route as AuthenticatedReportsLowStockRouteImport } from './routes/_authenticated/reports/low-stock'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/_admin/users'
 
 const LoginRoute = LoginRouteImport.update({
@@ -45,6 +46,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/_admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedReportsLowStockRoute =
+  AuthenticatedReportsLowStockRouteImport.update({
+    id: '/reports/low-stock',
+    path: '/reports/low-stock',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/sales': typeof AuthenticatedSalesRoute
   '/': typeof AuthenticatedIndexRoute
   '/users': typeof AuthenticatedAdminUsersRoute
+  '/reports/low-stock': typeof AuthenticatedReportsLowStockRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -64,6 +72,7 @@ export interface FileRoutesByTo {
   '/sales': typeof AuthenticatedSalesRoute
   '/': typeof AuthenticatedIndexRoute
   '/users': typeof AuthenticatedAdminUsersRoute
+  '/reports/low-stock': typeof AuthenticatedReportsLowStockRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -74,12 +83,19 @@ export interface FileRoutesById {
   '/_authenticated/sales': typeof AuthenticatedSalesRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/_admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/reports/low-stock': typeof AuthenticatedReportsLowStockRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/medicines' | '/sales' | '/' | '/users'
+  fullPaths:
+    | '/login'
+    | '/medicines'
+    | '/sales'
+    | '/'
+    | '/users'
+    | '/reports/low-stock'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/medicines' | '/sales' | '/' | '/users'
+  to: '/login' | '/medicines' | '/sales' | '/' | '/users' | '/reports/low-stock'
   id:
     | '__root__'
     | '/_authenticated'
@@ -89,6 +105,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sales'
     | '/_authenticated/'
     | '/_authenticated/_admin/users'
+    | '/_authenticated/reports/low-stock'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -140,6 +157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/reports/low-stock': {
+      id: '/_authenticated/reports/low-stock'
+      path: '/reports/low-stock'
+      fullPath: '/reports/low-stock'
+      preLoaderRoute: typeof AuthenticatedReportsLowStockRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/_admin/users': {
       id: '/_authenticated/_admin/users'
       path: '/users'
@@ -166,6 +190,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMedicinesRoute: typeof AuthenticatedMedicinesRoute
   AuthenticatedSalesRoute: typeof AuthenticatedSalesRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedReportsLowStockRoute: typeof AuthenticatedReportsLowStockRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -173,6 +198,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMedicinesRoute: AuthenticatedMedicinesRoute,
   AuthenticatedSalesRoute: AuthenticatedSalesRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedReportsLowStockRoute: AuthenticatedReportsLowStockRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
