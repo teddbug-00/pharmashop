@@ -56,7 +56,7 @@ const formSchema = z.object({
     selling_price: z.coerce.number().positive("Selling price must be positive"),
     batch: z.object({
         batch_number: z.string().optional(),
-        expiry_date: z.date({ required_error: "Expiry date is required" }),
+        expiry_date: z.date(),
         cost_price: z.coerce.number().positive("Cost price must be positive"),
         quantity: z.coerce.number().int().positive("Quantity must be a positive integer"),
     }),
