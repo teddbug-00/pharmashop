@@ -4,11 +4,7 @@ import { getMedicines } from "@/lib/api/medicines"
 import type { components } from "@/lib/api/schema"
 import { DataTable } from "@/components/data-table"
 import type { ColumnDef } from "@tanstack/react-table"
-import {
-    ArrowUpDown,
-    MoreHorizontal,
-    PlusCircle,
-} from "lucide-react"
+import { ArrowUpDown, MoreHorizontal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -20,6 +16,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
+import { AddMedicineDialog } from "@/components/add-medicine-dialog"
 
 type Medicine = components["schemas"]["MedicineInList"]
 
@@ -139,10 +136,7 @@ function MedicinesComponent() {
                         Manage all medicines in your inventory.
                     </p>
                 </div>
-                <Button size="sm">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Medicine
-                </Button>
+                <AddMedicineDialog />
             </div>
 
             {isLoadingMedicines ? (
