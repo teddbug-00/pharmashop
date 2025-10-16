@@ -25,6 +25,8 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 type Token = components["schemas"]["Token"]
+type UserPublic = components["schemas"]["UserPublic"]
+
 const formSchema = z.object({
     username: z.string().min(1, "Username is required"),
     password: z.string().min(1, "Password is required"),
@@ -61,17 +63,18 @@ function LoginComponent() {
             return res.data
         },
         onSuccess: (data) => {
-            // Create a sample user object, as you suggested.
-            // We'll assume the role is 'admin' for now to test admin features.
-            // When your backend is updated, this object will be replaced
-            // with the real user data from the API response.
-            const userToLogin = {
-                id: 1, // The schema requires an ID, so we'll add a placeholder
+            // Construct a minimal UserPublic object from the login response
+            // Note: The login endpoint does not return full UserPublic details (id, full_name, username).
+            // We are using placeholder values for id and full_name, and the username from the form.
+            // In a more complete application, you might fetch full user details from a /users/me endpoint.
+            const userToLogin: UserPublic = {
+                id: 0, // Placeholder ID
                 username: form.getValues("username"),
-                role: "admin" as const, // Hardcode to 'admin' for testing
+                full_name: form.getValues("username"), // Placeholder full_name
+                role: data.user_role,
             }
 
-            auth.login(data.access_token, userToLogin)
+            auth.login(data.access_token, data.refresh_token, userToLogin)
         },
         onError: (error) => {
             // You can handle login errors here, e.g., show a toast notification
