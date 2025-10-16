@@ -11,7 +11,7 @@ export const getMedicines = async (
     skip: number = 0,
     limit: number = 100, // Fetch more for client-side pagination/filtering
 ): Promise<MedicineInList[]> => {
-    const response = await api.get<MedicineInList[]>("/medicines/", {
+    const response = await api.get<MedicineInList[]>("/api/v1/medicines/", {
         params: { skip, limit },
     })
     return response.data
@@ -20,7 +20,7 @@ export const getMedicines = async (
 export const addMedicine = async (
     medicine: MedicineCreate,
 ): Promise<MedicinePublic> => {
-    const response = await api.post<MedicinePublic>("/medicines/", medicine)
+    const response = await api.post<MedicinePublic>("/api/v1/medicines/", medicine)
     return response.data
 }
 
@@ -32,14 +32,14 @@ export const updateMedicine = async ({
     medicine: MedicineUpdate
 }): Promise<MedicinePublic> => {
     const response = await api.put<MedicinePublic>(
-        `/medicines/${medicineId}`,
+        `/api/v1/medicines/${medicineId}`,
         medicine,
     )
     return response.data
 }
 
 export const deleteMedicine = async (medicineId: number): Promise<void> => {
-    await api.delete(`/medicines/${medicineId}`)
+    await api.delete(`/api/v1/medicines/${medicineId}`)
 }
 
 export const addBatch = async ({
@@ -50,7 +50,7 @@ export const addBatch = async ({
     batch: MedicineBatchCreate
 }): Promise<MedicinePublic> => {
     const response = await api.post<MedicinePublic>(
-        `/medicines/${medicineId}/batches`,
+        `/api/v1/medicines/${medicineId}/batches`,
         batch,
     )
     return response.data

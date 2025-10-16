@@ -4,7 +4,113 @@
  */
 
 export interface paths {
-    "/medicines/": {
+    "/api/v1/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register User */
+        post: operations["register_user_api_v1_auth_register_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login For Access Token */
+        post: operations["login_for_access_token_api_v1_auth_token_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/token/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh access token
+         * @description Takes a valid refresh token and returns a new access and refresh token pair.
+         */
+        post: operations["refresh_access_token_api_v1_auth_token_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a list of all users (Admin only)
+         * @description Retrieve a paginated list of all users.
+         */
+        get: operations["get_all_users_api_v1_users__get"];
+        put?: never;
+        /**
+         * Create a new user (Admin only)
+         * @description Create a new user with a specified role. This endpoint is restricted to admins.
+         */
+        post: operations["create_user_by_admin_api_v1_users__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a single user by ID (Admin only)
+         * @description Retrieve the details of a single user.
+         */
+        get: operations["get_user_by_id_api_v1_users__user_id__get"];
+        /**
+         * Update a user (Admin only)
+         * @description Update a user's details, such as their username or role.
+         */
+        put: operations["update_user_api_v1_users__user_id__put"];
+        post?: never;
+        /**
+         * Delete a user (Admin only)
+         * @description Delete a user from the system.
+         */
+        delete: operations["delete_user_api_v1_users__user_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/medicines/": {
         parameters: {
             query?: never;
             header?: never;
@@ -15,23 +121,41 @@ export interface paths {
          * Get a list of all medicines
          * @description Retrieves a paginated list of all medicines with summary inventory data.
          */
-        get: operations["get_all_medicines_medicines__get"];
+        get: operations["get_all_medicines_api_v1_medicines__get"];
         put?: never;
         /**
-         * Add a new medicine with its first batch
+         * Add a new medicine
          * @description Adds a new medicine to the inventory.
-         *
-         *     If a medicine with the same name already exists, it will raise an error.
-         *     A new medicine must be accompanied by its first batch details.
          */
-        post: operations["add_new_medicine_medicines__post"];
+        post: operations["add_new_medicine_api_v1_medicines__post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/medicines/{medicine_id}": {
+    "/api/v1/medicines/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import medicines from CSV file
+         * @description Imports medicine data from a CSV file. Each row should contain details for a new medicine
+         *     or a new batch for an existing medicine.
+         */
+        post: operations["import_medicines_from_csv_api_v1_medicines_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/medicines/{medicine_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -42,24 +166,24 @@ export interface paths {
          * Get a single medicine by ID
          * @description Retrieves the details of a single medicine, including all its batches.
          */
-        get: operations["get_medicine_by_id_medicines__medicine_id__get"];
+        get: operations["get_medicine_by_id_api_v1_medicines__medicine_id__get"];
         /**
          * Update a medicine
-         * @description Update a medicine's details, such as name, category, or selling price.
+         * @description Update a medicine's details, such as name, brand, or form.
          */
-        put: operations["update_medicine_medicines__medicine_id__put"];
+        put: operations["update_medicine_api_v1_medicines__medicine_id__put"];
         post?: never;
         /**
          * Delete a medicine
          * @description Deletes a medicine and all its associated batches from the inventory.
          */
-        delete: operations["delete_medicine_medicines__medicine_id__delete"];
+        delete: operations["delete_medicine_api_v1_medicines__medicine_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/medicines/{medicine_id}/batches": {
+    "/api/v1/medicines/{medicine_id}/batches": {
         parameters: {
             query?: never;
             header?: never;
@@ -72,14 +196,14 @@ export interface paths {
          * Add a new batch to a medicine
          * @description Adds a new batch of stock to an existing medicine.
          */
-        post: operations["add_new_batch_to_medicine_medicines__medicine_id__batches_post"];
+        post: operations["add_new_batch_to_medicine_api_v1_medicines__medicine_id__batches_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/sales/": {
+    "/api/v1/sales/": {
         parameters: {
             query?: never;
             header?: never;
@@ -90,7 +214,7 @@ export interface paths {
          * Get a list of all sales
          * @description Retrieves a paginated list of all sales transactions, ordered by the most recent first.
          */
-        get: operations["get_all_sales_sales__get"];
+        get: operations["get_all_sales_api_v1_sales__get"];
         put?: never;
         /**
          * Create a new sale
@@ -100,14 +224,14 @@ export interface paths {
          *     updates the inventory (decrementing from batches expiring soonest first),
          *     and records the sale. The entire operation is a single database transaction.
          */
-        post: operations["create_new_sale_sales__post"];
+        post: operations["create_new_sale_api_v1_sales__post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/sales/{sale_id}": {
+    "/api/v1/sales/{sale_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -118,7 +242,7 @@ export interface paths {
          * Get a single sale by ID
          * @description Retrieves the details of a single sale, including all its line items.
          */
-        get: operations["get_sale_by_id_sales__sale_id__get"];
+        get: operations["get_sale_by_id_api_v1_sales__sale_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -127,7 +251,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/dashboard/stats": {
+    "/api/v1/dashboard/stats": {
         parameters: {
             query?: never;
             header?: never;
@@ -136,10 +260,9 @@ export interface paths {
         };
         /**
          * Get dashboard statistics
-         * @description Retrieves key performance indicators for the dashboard, such as total
-         *     sales for today and the number of items with low stock.
+         * @description Retrieves aggregated statistics for the main dashboard.
          */
-        get: operations["get_dashboard_stats_dashboard_stats_get"];
+        get: operations["get_dashboard_stats_api_v1_dashboard_stats_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -148,7 +271,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/dashboard/low-stock": {
+    "/api/v1/dashboard/sales-stats/{period}": {
         parameters: {
             query?: never;
             header?: never;
@@ -156,11 +279,13 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get a report of low-stock items
-         * @description Retrieves a list of all medicines where the total quantity is at or
-         *     below the specified threshold.
+         * Get sales statistics for a specific period
+         * @description Retrieves total revenue and sales count for a given period:
+         *     - **today**: Stats for the current day.
+         *     - **last_7_days**: Stats for the last 7 days.
+         *     - **last_30_days**: Stats for the last 30 days.
          */
-        get: operations["get_low_stock_report_dashboard_low_stock_get"];
+        get: operations["get_sales_stats_api_v1_dashboard_sales_stats__period__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -169,7 +294,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/dashboard/expiring-soon": {
+    "/api/v1/dashboard/inventory-summary": {
         parameters: {
             query?: never;
             header?: never;
@@ -177,11 +302,14 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get a report of batches expiring soon
-         * @description Retrieves a list of all medicine batches that will expire within the
-         *     specified number of days.
+         * Get a summary of inventory counts
+         * @description Retrieves a summary of inventory:
+         *     - **total_medicines**: Count of all unique medicines.
+         *     - **low_stock_medicines**: Count of medicines with quantity below the threshold.
+         *     - **expired_batches**: Count of expired medicine batches.
+         *     - **out_of_stock_medicines**: Count of medicines with zero quantity.
          */
-        get: operations["get_expiring_soon_report_dashboard_expiring_soon_get"];
+        get: operations["get_inventory_summary_api_v1_dashboard_inventory_summary_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -190,87 +318,99 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/register": {
+    "/api/v1/dashboard/top-selling-products": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Get the top-selling products
+         * @description Retrieves a list of the top-selling products by quantity sold.
+         */
+        get: operations["get_top_selling_products_api_v1_dashboard_top_selling_products_get"];
         put?: never;
-        /** Register User */
-        post: operations["register_user_auth_register_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/auth/token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Login For Access Token */
-        post: operations["login_for_access_token_auth_token_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get a list of all users (Admin only)
-         * @description Retrieve a paginated list of all users.
-         */
-        get: operations["get_all_users_users__get"];
-        put?: never;
-        /**
-         * Create a new user (Admin only)
-         * @description Create a new user with a specified role. This endpoint is restricted to admins.
-         */
-        post: operations["create_user_by_admin_users__post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/{user_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get a single user by ID (Admin only)
-         * @description Retrieve the details of a single user.
-         */
-        get: operations["get_user_by_id_users__user_id__get"];
-        /**
-         * Update a user (Admin only)
-         * @description Update a user's details, such as their username or role.
-         */
-        put: operations["update_user_users__user_id__put"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/expiring-soon-batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
         /**
-         * Delete a user (Admin only)
-         * @description Delete a user from the system.
+         * Get batches expiring soon
+         * @description Retrieves a list of medicine batches that will expire within a specified number of days.
          */
-        delete: operations["delete_user_users__user_id__delete"];
+        get: operations["get_expiring_soon_batches_api_v1_dashboard_expiring_soon_batches_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/recent-sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get recent sales transactions
+         * @description Retrieves a list of the most recent sales transactions.
+         */
+        get: operations["get_recent_sales_api_v1_dashboard_recent_sales_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/sales-by-category": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get sales revenue by medicine category
+         * @description Retrieves total sales revenue grouped by medicine category, sorted
+         *     in descending order of revenue.
+         */
+        get: operations["get_sales_by_category_api_v1_dashboard_sales_by_category_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Root */
+        get: operations["read_root__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -280,8 +420,17 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** Body_login_for_access_token_auth_token_post */
-        Body_login_for_access_token_auth_token_post: {
+        /** Body_import_medicines_from_csv_api_v1_medicines_import_post */
+        Body_import_medicines_from_csv_api_v1_medicines_import_post: {
+            /**
+             * File
+             * Format: binary
+             * @description CSV file containing medicine data
+             */
+            file: string;
+        };
+        /** Body_login_for_access_token_api_v1_auth_token_post */
+        Body_login_for_access_token_api_v1_auth_token_post: {
             /** Grant Type */
             grant_type?: string | null;
             /** Username */
@@ -305,28 +454,34 @@ export interface components {
             client_secret?: string | null;
         };
         /**
-         * Category
-         * @description Represents a category of medicine
+         * CategoryEnum
          * @enum {string}
          */
-        Category: "painkiller" | "antibiotic" | "supplement" | "antibacterial" | "antiseptic" | "other";
+        CategoryEnum: "Pain Relief" | "Antibiotics" | "Antiseptics" | "Vitamins & Supplements" | "Allergy & Hayfever" | "Cold & Flu" | "Digestive Health" | "Skin Care" | "Unassigned";
         /** DashboardStats */
         DashboardStats: {
-            /** Total Sales Today */
-            total_sales_today: string;
-            /** Total Medicines */
-            total_medicines: number;
-            /** Low Stock Items Count */
-            low_stock_items_count: number;
+            sales_today: components["schemas"]["SalesPeriodStats"];
+            sales_last_7_days: components["schemas"]["SalesPeriodStats"];
+            sales_last_30_days: components["schemas"]["SalesPeriodStats"];
+            /** Inventory Summary */
+            inventory_summary: {
+                [key: string]: number;
+            };
+            /** Top Selling Products */
+            top_selling_products: components["schemas"]["TopSellingProduct"][];
+            /** Expiring Soon Batches */
+            expiring_soon_batches: components["schemas"]["ExpiringSoonBatch"][];
+            /** Sales By Category */
+            sales_by_category: components["schemas"]["SalesByCategory"][];
+            /** Recent Sales */
+            recent_sales: components["schemas"]["RecentSale"][];
         };
-        /** ExpiringBatchItem */
-        ExpiringBatchItem: {
-            /** Medicine Id */
-            medicine_id: number;
+        /** ExpiringSoonBatch */
+        ExpiringSoonBatch: {
             /** Medicine Name */
             medicine_name: string;
-            /** Batch Id */
-            batch_id: number;
+            /** Brand */
+            brand: string;
             /** Batch Number */
             batch_number: string | null;
             /**
@@ -334,8 +489,8 @@ export interface components {
              * Format: date
              */
             expiry_date: string;
-            /** Quantity Remaining */
-            quantity_remaining: number;
+            /** Quantity */
+            quantity: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -353,6 +508,8 @@ export interface components {
             expiry_date: string;
             /** Cost Price */
             cost_price: number | string;
+            /** Selling Price */
+            selling_price: number | string;
             /**
              * Quantity
              * @description The initial quantity of the batch, must be positive.
@@ -370,6 +527,8 @@ export interface components {
             expiry_date: string;
             /** Cost Price */
             cost_price: string;
+            /** Selling Price */
+            selling_price: string;
             /** Id */
             id: number;
             /**
@@ -389,22 +548,30 @@ export interface components {
         MedicineCreate: {
             /** Name */
             name: string;
-            /** @default other */
-            category: components["schemas"]["Category"];
-            /** Selling Price */
-            selling_price: number | string;
-            batch: components["schemas"]["MedicineBatchCreate"];
+            /** Brand */
+            brand: string;
+            form: components["schemas"]["MedicineForm"];
+            /** @default Unassigned */
+            category: components["schemas"]["CategoryEnum"];
         };
+        /**
+         * MedicineForm
+         * @enum {string}
+         */
+        MedicineForm: "TABLET" | "SYRUP" | "CAPSULE" | "INJECTION" | "OINTMENT" | "DROPS" | "OTHER";
         /** MedicineInList */
         MedicineInList: {
             /** Name */
             name: string;
-            /** @default other */
-            category: components["schemas"]["Category"];
-            /** Selling Price */
-            selling_price: string;
+            /** Brand */
+            brand: string;
+            form: components["schemas"]["MedicineForm"];
+            /** @default Unassigned */
+            category: components["schemas"]["CategoryEnum"];
             /** Id */
             id: number;
+            /** Serial Number */
+            serial_number: string;
             /** Total Quantity */
             total_quantity: number;
             /** Earliest Expiry */
@@ -414,12 +581,15 @@ export interface components {
         MedicinePublic: {
             /** Name */
             name: string;
-            /** @default other */
-            category: components["schemas"]["Category"];
-            /** Selling Price */
-            selling_price: string;
+            /** Brand */
+            brand: string;
+            form: components["schemas"]["MedicineForm"];
+            /** @default Unassigned */
+            category: components["schemas"]["CategoryEnum"];
             /** Id */
             id: number;
+            /** Serial Number */
+            serial_number: string;
             /**
              * Batches
              * @default []
@@ -434,17 +604,18 @@ export interface components {
         MedicineUpdate: {
             /** Name */
             name?: string | null;
-            category?: components["schemas"]["Category"] | null;
-            /** Selling Price */
-            selling_price?: number | string | null;
+            /** Brand */
+            brand?: string | null;
+            form?: components["schemas"]["MedicineForm"] | null;
+            category?: components["schemas"]["CategoryEnum"] | null;
         };
-        /** SaleCreate */
-        SaleCreate: {
-            /** Items */
-            items: components["schemas"]["SaleItemCreate"][];
-        };
-        /** SaleInList */
-        SaleInList: {
+        /**
+         * PaymentMethod
+         * @enum {string}
+         */
+        PaymentMethod: "CASH" | "MOMO";
+        /** RecentSale */
+        RecentSale: {
             /** Id */
             id: number;
             /**
@@ -452,8 +623,38 @@ export interface components {
              * Format: date-time
              */
             sale_date: string;
+            /** Invoice Number */
+            invoice_number: string;
             /** Total Amount */
-            total_amount: number;
+            total_amount: string;
+        };
+        /** RefreshToken */
+        RefreshToken: {
+            /** Refresh Token */
+            refresh_token: string;
+        };
+        /** SaleCreate */
+        SaleCreate: {
+            /** Items */
+            items: components["schemas"]["SaleItemCreate"][];
+            /** @default CASH */
+            payment_method: components["schemas"]["PaymentMethod"];
+        };
+        /** SaleInList */
+        SaleInList: {
+            /** Id */
+            id: number;
+            /** Invoice Number */
+            invoice_number: string;
+            /**
+             * Sale Date
+             * Format: date-time
+             */
+            sale_date: string;
+            /** Total Amount */
+            total_amount: string;
+            /** Sold By Username */
+            sold_by_username: string;
         };
         /** SaleItemCreate */
         SaleItemCreate: {
@@ -462,23 +663,23 @@ export interface components {
             /** Quantity */
             quantity: number;
         };
-        /** SaleItemPublic */
-        SaleItemPublic: {
-            /** Medicine Id */
-            medicine_id: number;
+        /** SaleItemReceipt */
+        SaleItemReceipt: {
+            /** Medicine Name */
+            medicine_name: string;
             /** Quantity */
             quantity: number;
-            /** Id */
-            id: number;
-            /** Price Per Unit */
-            price_per_unit: string;
-            /** Medicine Name */
-            readonly medicine_name: string;
+            /** Unit Price */
+            unit_price: string;
+            /** Subtotal */
+            subtotal: string;
         };
-        /** SalePublic */
-        SalePublic: {
+        /** SaleReceipt */
+        SaleReceipt: {
             /** Id */
             id: number;
+            /** Invoice Number */
+            invoice_number: string;
             /**
              * Sale Date
              * Format: date-time
@@ -486,45 +687,84 @@ export interface components {
             sale_date: string;
             /** Total Amount */
             total_amount: string;
+            payment_method: components["schemas"]["PaymentMethod"];
+            /** Sold By Username */
+            sold_by_username: string;
             /** Items */
-            items: components["schemas"]["SaleItemPublic"][];
+            items: components["schemas"]["SaleItemReceipt"][];
+        };
+        /** SalesByCategory */
+        SalesByCategory: {
+            /** Category Name */
+            category_name: string;
+            /** Total Revenue */
+            total_revenue: string;
+        };
+        /** SalesPeriodStats */
+        SalesPeriodStats: {
+            /** Total Revenue */
+            total_revenue: string;
+            /** Sales Count */
+            sales_count: number;
         };
         /** Token */
         Token: {
             /** Access Token */
             access_token: string;
+            /** Refresh Token */
+            refresh_token: string;
             /** Token Type */
             token_type: string;
+            user_role: components["schemas"]["UserRole"];
+        };
+        /** TopSellingProduct */
+        TopSellingProduct: {
+            /** Medicine Id */
+            medicine_id: number;
+            /** Name */
+            name: string;
+            /** Brand */
+            brand: string;
+            /** Total Quantity Sold */
+            total_quantity_sold: number;
         };
         /** UserCreate */
         UserCreate: {
-            /** Username */
-            username: string;
-            /** Password */
+            /** Full Name */
+            full_name: string;
+            /**
+             * Password
+             * @description Password must be at least 6 characters.
+             */
             password: string;
         };
         /** UserCreateWithRole */
         UserCreateWithRole: {
-            /** Username */
-            username: string;
-            /** Password */
+            /** Full Name */
+            full_name: string;
+            /**
+             * Password
+             * @description Password must be at least 6 characters.
+             */
             password: string;
-            /** @default seller */
+            /** @default CASHIER */
             role: components["schemas"]["UserRole"];
         };
         /** UserPublic */
         UserPublic: {
-            /** Username */
-            username: string;
+            /** Full Name */
+            full_name: string;
             /** Id */
             id: number;
+            /** Username */
+            username: string;
             role: components["schemas"]["UserRole"];
         };
         /**
          * UserRole
          * @enum {string}
          */
-        UserRole: "admin" | "seller";
+        UserRole: "ADMIN" | "MANAGER" | "CASHIER";
         /** UserUpdate */
         UserUpdate: {
             /** Username */
@@ -549,380 +789,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    get_all_medicines_medicines__get: {
-        parameters: {
-            query?: {
-                skip?: number;
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MedicineInList"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    add_new_medicine_medicines__post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MedicineCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MedicinePublic"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_medicine_by_id_medicines__medicine_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                medicine_id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MedicinePublic"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_medicine_medicines__medicine_id__put: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                medicine_id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MedicineUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MedicinePublic"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_medicine_medicines__medicine_id__delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                medicine_id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    add_new_batch_to_medicine_medicines__medicine_id__batches_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                medicine_id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MedicineBatchCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MedicinePublic"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_all_sales_sales__get: {
-        parameters: {
-            query?: {
-                skip?: number;
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SaleInList"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_new_sale_sales__post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SaleCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SalePublic"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_sale_by_id_sales__sale_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                sale_id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SalePublic"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_dashboard_stats_dashboard_stats_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DashboardStats"];
-                };
-            };
-        };
-    };
-    get_low_stock_report_dashboard_low_stock_get: {
-        parameters: {
-            query?: {
-                threshold?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MedicineInList"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_expiring_soon_report_dashboard_expiring_soon_get: {
-        parameters: {
-            query?: {
-                days?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ExpiringBatchItem"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    register_user_auth_register_post: {
+    register_user_api_v1_auth_register_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -955,7 +822,7 @@ export interface operations {
             };
         };
     };
-    login_for_access_token_auth_token_post: {
+    login_for_access_token_api_v1_auth_token_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -964,7 +831,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/x-www-form-urlencoded": components["schemas"]["Body_login_for_access_token_auth_token_post"];
+                "application/x-www-form-urlencoded": components["schemas"]["Body_login_for_access_token_api_v1_auth_token_post"];
             };
         };
         responses: {
@@ -988,7 +855,40 @@ export interface operations {
             };
         };
     };
-    get_all_users_users__get: {
+    refresh_access_token_api_v1_auth_token_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshToken"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Token"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_all_users_api_v1_users__get: {
         parameters: {
             query?: {
                 skip?: number;
@@ -1020,7 +920,7 @@ export interface operations {
             };
         };
     };
-    create_user_by_admin_users__post: {
+    create_user_by_admin_api_v1_users__post: {
         parameters: {
             query?: never;
             header?: never;
@@ -1053,7 +953,7 @@ export interface operations {
             };
         };
     };
-    get_user_by_id_users__user_id__get: {
+    get_user_by_id_api_v1_users__user_id__get: {
         parameters: {
             query?: never;
             header?: never;
@@ -1084,7 +984,7 @@ export interface operations {
             };
         };
     };
-    update_user_users__user_id__put: {
+    update_user_api_v1_users__user_id__put: {
         parameters: {
             query?: never;
             header?: never;
@@ -1119,7 +1019,7 @@ export interface operations {
             };
         };
     };
-    delete_user_users__user_id__delete: {
+    delete_user_api_v1_users__user_id__delete: {
         parameters: {
             query?: never;
             header?: never;
@@ -1144,6 +1044,584 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_all_medicines_api_v1_medicines__get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                required_token_type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MedicineInList"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_new_medicine_api_v1_medicines__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MedicineCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MedicinePublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_medicines_from_csv_api_v1_medicines_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_import_medicines_from_csv_api_v1_medicines_import_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_medicine_by_id_api_v1_medicines__medicine_id__get: {
+        parameters: {
+            query?: {
+                required_token_type?: string;
+            };
+            header?: never;
+            path: {
+                medicine_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MedicinePublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_medicine_api_v1_medicines__medicine_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                medicine_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MedicineUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MedicinePublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_medicine_api_v1_medicines__medicine_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                medicine_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_new_batch_to_medicine_api_v1_medicines__medicine_id__batches_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                medicine_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MedicineBatchCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MedicinePublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_all_sales_api_v1_sales__get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                required_token_type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SaleInList"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_new_sale_api_v1_sales__post: {
+        parameters: {
+            query?: {
+                required_token_type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaleCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SaleReceipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_sale_by_id_api_v1_sales__sale_id__get: {
+        parameters: {
+            query?: {
+                required_token_type?: string;
+            };
+            header?: never;
+            path: {
+                sale_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SaleReceipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_dashboard_stats_api_v1_dashboard_stats_get: {
+        parameters: {
+            query?: {
+                required_token_type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardStats"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_sales_stats_api_v1_dashboard_sales_stats__period__get: {
+        parameters: {
+            query?: {
+                required_token_type?: string;
+            };
+            header?: never;
+            path: {
+                period: "today" | "last_7_days" | "last_30_days";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesPeriodStats"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_inventory_summary_api_v1_dashboard_inventory_summary_get: {
+        parameters: {
+            query?: {
+                required_token_type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_top_selling_products_api_v1_dashboard_top_selling_products_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                required_token_type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopSellingProduct"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_expiring_soon_batches_api_v1_dashboard_expiring_soon_batches_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                days_ahead?: number;
+                required_token_type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpiringSoonBatch"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_recent_sales_api_v1_dashboard_recent_sales_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                required_token_type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecentSale"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_sales_by_category_api_v1_dashboard_sales_by_category_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                required_token_type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesByCategory"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_root__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };

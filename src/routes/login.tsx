@@ -53,7 +53,7 @@ function LoginComponent() {
             formData.append("username", values.username)
             formData.append("password", values.password)
 
-            const res = await api.post<Token>("/auth/token", formData, {
+            const res = await api.post<Token>("/api/v1/auth/token", formData, {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
