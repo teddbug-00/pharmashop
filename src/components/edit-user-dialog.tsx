@@ -36,8 +36,7 @@ import type { components } from "@/lib/api/schema"
 type User = components["schemas"]["UserPublic"]
 
 const formSchema = z.object({
-    username: z.string().min(3, "Username must be at least 3 characters long").optional(),
-    role: z.enum(["admin", "seller"]).optional(),
+    role: z.enum(["ADMIN", "MANAGER", "CASHIER"]).optional(),
 })
 
 interface EditUserDialogProps {
@@ -52,7 +51,6 @@ export function EditUserDialog({ user, isOpen, onOpenChange }: EditUserDialogPro
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            username: user.username,
             role: user.role,
         },
     })
@@ -79,7 +77,6 @@ export function EditUserDialog({ user, isOpen, onOpenChange }: EditUserDialogPro
     React.useEffect(() => {
         if (isOpen) {
             form.reset({
-                username: user.username,
                 role: user.role,
             })
         }
@@ -91,7 +88,7 @@ export function EditUserDialog({ user, isOpen, onOpenChange }: EditUserDialogPro
                 <DialogHeader>
                     <DialogTitle>Edit User</DialogTitle>
                     <DialogDescription>
-                        Update the details for {user.username}.
+                        Update the details for {user.full_name}.
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -99,19 +96,6 @@ export function EditUserDialog({ user, isOpen, onOpenChange }: EditUserDialogPro
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-4"
                     >
-                        <FormField
-                            control={form.control}
-                            name="username"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Username</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="johndoe" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
                         <FormField
                             control={form.control}
                             name="role"
@@ -125,8 +109,9 @@ export function EditUserDialog({ user, isOpen, onOpenChange }: EditUserDialogPro
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            <SelectItem value="seller">Seller</SelectItem>
-                                            <SelectItem value="admin">Admin</SelectItem>
+                                            <SelectItem value="CASHIER">Cashier</SelectItem>
+                                            <SelectItem value="MANAGER">Manager</SelectItem>
+                                            <SelectItem value="ADMIN">Admin</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />

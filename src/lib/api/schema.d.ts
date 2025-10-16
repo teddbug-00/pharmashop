@@ -110,6 +110,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/{user_id}/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Reset a user's password (Admin only)
+         * @description Allows an admin to reset a user's password.
+         */
+        patch: operations["reset_user_password_api_v1_users__user_id__reset_password_patch"];
+        trace?: never;
+    };
     "/api/v1/medicines/": {
         parameters: {
             query?: never;
@@ -150,6 +170,27 @@ export interface paths {
          */
         post: operations["import_medicines_from_csv_api_v1_medicines_import_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/medicines/bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete multiple medicines by ID
+         * @description Deletes multiple medicines based on a list of medicine IDs provided in the request body.
+         *     Returns the number of medicines deleted.
+         */
+        delete: operations["delete_multiple_medicines_api_v1_medicines_bulk_delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -218,27 +259,6 @@ export interface paths {
          */
         post: operations["add_new_batch_to_medicine_api_v1_medicines__medicine_id__batches_post"];
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/medicines/bulk": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Delete multiple medicines by ID
-         * @description Deletes multiple medicines based on a list of medicine IDs provided in the request body.
-         *     Returns the number of medicines deleted.
-         */
-        delete: operations["delete_multiple_medicines_api_v1_medicines_bulk_delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -807,6 +827,14 @@ export interface components {
             /** @default CASHIER */
             role: components["schemas"]["UserRole"];
         };
+        /** UserPasswordReset */
+        UserPasswordReset: {
+            /**
+             * New Password
+             * @description New password must be at least 6 characters.
+             */
+            new_password: string;
+        };
         /** UserPublic */
         UserPublic: {
             /** Full Name */
@@ -1105,6 +1133,41 @@ export interface operations {
             };
         };
     };
+    reset_user_password_api_v1_users__user_id__reset_password_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserPasswordReset"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_all_medicines_api_v1_medicines__get: {
         parameters: {
             query?: {
@@ -1181,6 +1244,39 @@ export interface operations {
         requestBody: {
             content: {
                 "multipart/form-data": components["schemas"]["Body_import_medicines_from_csv_api_v1_medicines_import_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_multiple_medicines_api_v1_medicines_bulk_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MedicineBulkDelete"];
             };
         };
         responses: {
@@ -1358,39 +1454,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MedicinePublic"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_multiple_medicines_api_v1_medicines_bulk_delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MedicineBulkDelete"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

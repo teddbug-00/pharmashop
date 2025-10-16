@@ -35,9 +35,9 @@ import {
 } from "@/components/ui/select"
 
 const formSchema = z.object({
-    username: z.string().min(3, "Username must be at least 3 characters long"),
+    full_name: z.string().min(3, "Full name must be at least 3 characters long"),
     password: z.string().min(6, "Password must be at least 6 characters long"),
-    role: z.enum(["admin", "seller"]),
+    role: z.enum(["ADMIN", "MANAGER", "CASHIER"]),
 })
 
 function generatePassword(length = 6) {
@@ -58,9 +58,9 @@ export function NewUserDialog() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            username: "",
+            full_name: "",
             password: "",
-            role: "seller",
+            role: "CASHIER",
         },
     })
 
@@ -106,12 +106,12 @@ export function NewUserDialog() {
                     >
                         <FormField
                             control={form.control}
-                            name="username"
+                            name="full_name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Username</FormLabel>
+                                    <FormLabel>Full Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="johndoe" {...field} />
+                                        <Input placeholder="John Doe" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -173,8 +173,9 @@ export function NewUserDialog() {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            <SelectItem value="seller">Seller</SelectItem>
-                                            <SelectItem value="admin">Admin</SelectItem>
+                                            <SelectItem value="CASHIER">Cashier</SelectItem>
+                                            <SelectItem value="MANAGER">Manager</SelectItem>
+                                            <SelectItem value="ADMIN">Admin</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
