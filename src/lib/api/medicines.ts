@@ -6,6 +6,8 @@ type MedicinePublic = components["schemas"]["MedicinePublic"]
 type MedicineCreate = components["schemas"]["MedicineCreate"]
 type MedicineUpdate = components["schemas"]["MedicineUpdate"]
 type MedicineQuote = components["schemas"]["MedicineQuote"]
+type BatchCreate = components["schemas"]["MedicineBatchCreate"]
+type MedicineBulkDelete = components["schemas"]["MedicineBulkDelete"]
 
 export const getMedicines = async (
     skip: number = 0,
@@ -39,6 +41,11 @@ export const deleteMedicine = async (id: number) => {
     await api.delete(`/api/v1/medicines/${id}`)
 }
 
+export const deleteMultipleMedicines = async (ids: number[]) => {
+    const payload: MedicineBulkDelete = { medicine_ids: ids }
+    await api.delete("/api/v1/medicines/bulk", { data: payload })
+}
+
 export const getMedicineQuote = async (id: number, quantity: number): Promise<MedicineQuote> => {
     const response = await api.get<MedicineQuote>(
         `/api/v1/medicines/${id}/quote`,
@@ -46,5 +53,30 @@ export const getMedicineQuote = async (id: number, quantity: number): Promise<Me
             params: { quantity },
         },
     )
+    return response.data
+}
+
+export const addBatch = async ({
+    medicineId,
+    batch,
+}: {
+    medicineId: number
+    batch: BatchCreate
+}): Promise<MedicinePublic> => {
+    const response = await api.post<MedicinePublic>(
+        `/api/v1/medicines/${medicineId}/batches`,
+        batch,
+    )
+    return response.data
+}
+
+export const importMedicinesCSV = async (file: File) => {
+    const formData = new FormData()
+    formData.append("file", file)
+    const response = await api.post("/api/v1/medicines/import", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    })
     return response.data
 }
