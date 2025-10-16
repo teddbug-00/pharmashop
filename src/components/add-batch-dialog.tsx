@@ -39,8 +39,11 @@ type Medicine = components["schemas"]["MedicineInList"]
 
 const formSchema = z.object({
     batch_number: z.string().optional(),
-    expiry_date: z.date(),
+    expiry_date: z.date({
+        required_error: "Expiry date is required",
+    }),
     cost_price: z.coerce.number().positive("Cost price must be positive"),
+    selling_price: z.coerce.number().positive("Selling price must be positive"),
     quantity: z.coerce.number().int().positive("Quantity must be a positive integer"),
 })
 
@@ -62,7 +65,9 @@ export function AddBatchDialog({
     const form = useForm<AddBatchFormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            batch_number: "",
             cost_price: 0,
+            selling_price: 0,
             quantity: 1,
             expiry_date: new Date(),
         },
@@ -71,8 +76,11 @@ export function AddBatchDialog({
     const addBatchMutation = useMutation({
         mutationFn: (values: AddBatchFormValues) => {
             const apiPayload = {
-                ...values,
-                expiry_date: values.expiry_date.toISOString().split("T")[0],
+                batch_number: values.batch_number || null,
+                expiry_date: format(values.expiry_date, "yyyy-MM-dd"),
+                cost_price: values.cost_price,
+                selling_price: values.selling_price,
+                quantity: values.quantity,
             }
             return addBatch({ medicineId: medicine.id, batch: apiPayload })
         },
@@ -112,8 +120,9 @@ export function AddBatchDialog({
                         <FormField control={form.control} name="expiry_date" render={({ field }) => <FormItem className="flex flex-col"><FormLabel>Expiry Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}><>{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}</><CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} /></PopoverContent></Popover><FormMessage /></FormItem>} />
                         <div className="grid grid-cols-2 gap-4">
                             <FormField control={form.control} name="cost_price" render={({ field }) => <FormItem><FormLabel>Cost Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>} />
-                            <FormField control={form.control} name="quantity" render={({ field }) => <FormItem><FormLabel>Quantity</FormLabel><FormControl><Input type="number" step="1" {...field} /></FormControl><FormMessage /></FormItem>} />
+                            <FormField control={form.control} name="selling_price" render={({ field }) => <FormItem><FormLabel>Selling Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>} />
                         </div>
+                        <FormField control={form.control} name="quantity" render={({ field }) => <FormItem><FormLabel>Quantity</FormLabel><FormControl><Input type="number" step="1" {...field} /></FormControl><FormMessage /></FormItem>} />
                         <DialogFooter>
                             <Button type="submit" disabled={addBatchMutation.isPending}>
                                 {addBatchMutation.isPending ? "Adding..." : "Add Batch"}

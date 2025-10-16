@@ -1,13 +1,12 @@
 import * as React from "react"
 import type {
     ColumnDef,
-    ColumnFiltersState,
     SortingState,
+    RowSelectionState,
 } from "@tanstack/react-table"
 import {
     flexRender,
     getCoreRowModel,
-    getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
@@ -22,25 +21,21 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
-    filterColumnId: string
-    filterColumnPlaceholder: string
+    rowSelection: RowSelectionState
+    setRowSelection: React.Dispatch<React.SetStateAction<RowSelectionState>>
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
-    filterColumnId,
-    filterColumnPlaceholder,
+    rowSelection,
+    setRowSelection,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-        [],
-    )
 
     const table = useReactTable({
         data,
@@ -49,28 +44,16 @@ export function DataTable<TData, TValue>({
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
-        onColumnFiltersChange: setColumnFilters,
-        getFilteredRowModel: getFilteredRowModel(),
+        onRowSelectionChange: setRowSelection,
         state: {
             sorting,
-            columnFilters,
+            rowSelection,
         },
+        enableRowSelection: true,
     })
 
     return (
         <div>
-            <div className="flex items-center py-4">
-                <Input
-                    placeholder={filterColumnPlaceholder}
-                    value={
-                        (table.getColumn(filterColumnId)?.getFilterValue() as string) ?? ""
-                    }
-                    onChange={(event) =>
-                        table.getColumn(filterColumnId)?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm"
-                />
-            </div>
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>

@@ -4,10 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { CalendarIcon, PlusCircle } from "lucide-react"
-import { format } from "date-fns"
+import { PlusCircle } from "lucide-react"
 
 import { addMedicine } from "@/lib/api/medicines"
+import type { components } from "@/lib/api/schema"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -34,31 +34,29 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { cn } from "@/lib/utils"
+
+
+type MedicineCreate = components["schemas"]["MedicineCreate"]
 
 const formSchema = z.object({
     name: z.string().min(3, "Medicine name must be at least 3 characters long"),
+    brand: z.string().min(1, "Brand is required"),
+    form: z.enum(["TABLET", "SYRUP", "CAPSULE", "INJECTION", "OINTMENT", "DROPS", "OTHER"], {
+        errorMap: () => ({ message: "Please select a valid form" }),
+    }),
     category: z.enum([
-        "painkiller",
-        "antibiotic",
-        "supplement",
-        "antibacterial",
-        "antiseptic",
-        "other",
-    ]),
-    selling_price: z.coerce.number().positive("Selling price must be positive"),
-    batch: z.object({
-        batch_number: z.string().optional(),
-        expiry_date: z.date(),
-        cost_price: z.coerce.number().positive("Cost price must be positive"),
-        quantity: z.coerce.number().int().positive("Quantity must be a positive integer"),
+        "Pain Relief",
+        "Antibiotics",
+        "Antiseptics",
+        "Vitamins & Supplements",
+        "Allergy & Hayfever",
+        "Cold & Flu",
+        "Digestive Health",
+        "Skin Care",
+        "Unassigned",
+    ], {
+        errorMap: () => ({ message: "Please select a valid category" }),
     }),
 })
 
@@ -70,17 +68,23 @@ export function AddMedicineDialog() {
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
-            category: "other",
-            selling_price: 0,
-            batch: {
-                cost_price: 0,
-                quantity: 1,
-            },
+            brand: "",
+            form: "TABLET", // Default form
+            category: "Unassigned", // Default category
         },
     })
 
     const addMedicineMutation = useMutation({
-        mutationFn: (values: z.infer<typeof formSchema>) => addMedicine(values),
+        mutationFn: async (values: z.infer<typeof formSchema>) => {
+            const medicineCreate: MedicineCreate = {
+                name: values.name,
+                brand: values.brand,
+                form: values.form,
+                category: values.category,
+            }
+            const newMedicine = await addMedicine(medicineCreate)
+            return newMedicine
+        },
         onSuccess: async (data) => {
             await queryClient.invalidateQueries({ queryKey: ["medicines"] })
             toast.success(`Medicine "${data.name}" added successfully!`)
@@ -110,30 +114,39 @@ export function AddMedicineDialog() {
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
-                        className="contents" // Use 'contents' to make the form a non-visual wrapper
+                        className="contents"
                     >
                         <DialogHeader className="p-6 pb-4">
                             <DialogTitle>Add New Medicine</DialogTitle>
                             <DialogDescription>
-                                Add a new product to your inventory, including its first batch.
+                                Add a new product to your inventory.
                             </DialogDescription>
                         </DialogHeader>
 
                         <ScrollArea>
                             <div className="space-y-4 px-6 py-2">
                                 <FormField control={form.control} name="name" render={({ field }) => <FormItem><FormLabel>Name</FormLabel><FormControl><Input placeholder="Paracetamol 500mg" {...field} /></FormControl><FormMessage /></FormItem>} />
-                                <FormField control={form.control} name="category" render={({ field }) => <FormItem><FormLabel>Category</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl><SelectContent><SelectItem value="painkiller">Painkiller</SelectItem><SelectItem value="antibiotic">Antibiotic</SelectItem><SelectItem value="supplement">Supplement</SelectItem><SelectItem value="antibacterial">Antibacterial</SelectItem><SelectItem value="antiseptic">Antiseptic</SelectItem><SelectItem value="other">Other</SelectItem></SelectContent></Select><FormMessage /></FormItem>} />
-                                <FormField control={form.control} name="selling_price" render={({ field }) => <FormItem><FormLabel>Selling Price (GHS)</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>} />
-
-                                <div className="space-y-4 rounded-md border p-4">
-                                    <h4 className="font-medium">First Batch Details</h4>
-                                    <FormField control={form.control} name="batch.batch_number" render={({ field }) => <FormItem><FormLabel>Batch Number (Optional)</FormLabel><FormControl><Input placeholder="B12345" {...field} /></FormControl><FormMessage /></FormItem>} />
-                                    <FormField control={form.control} name="batch.expiry_date" render={({ field }) => <FormItem className="flex flex-col"><FormLabel>Expiry Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}><>{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}</><CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>} />
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <FormField control={form.control} name="batch.cost_price" render={({ field }) => <FormItem><FormLabel>Cost Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>} />
-                                        <FormField control={form.control} name="batch.quantity" render={({ field }) => <FormItem><FormLabel>Quantity</FormLabel><FormControl><Input type="number" step="1" {...field} /></FormControl><FormMessage /></FormItem>} />
-                                    </div>
-                                </div>
+                                <FormField control={form.control} name="brand" render={({ field }) => <FormItem><FormLabel>Brand</FormLabel><FormControl><Input placeholder="GSK" {...field} /></FormControl><FormMessage /></FormItem>} />
+                                <FormField control={form.control} name="form" render={({ field }) => <FormItem><FormLabel>Form</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select medicine form" /></SelectTrigger></FormControl><SelectContent>
+                                    <SelectItem value="TABLET">Tablet</SelectItem>
+                                    <SelectItem value="SYRUP">Syrup</SelectItem>
+                                    <SelectItem value="CAPSULE">Capsule</SelectItem>
+                                    <SelectItem value="INJECTION">Injection</SelectItem>
+                                    <SelectItem value="OINTMENT">Ointment</SelectItem>
+                                    <SelectItem value="DROPS">Drops</SelectItem>
+                                    <SelectItem value="OTHER">Other</SelectItem>
+                                </SelectContent></Select><FormMessage /></FormItem>} />
+                                <FormField control={form.control} name="category" render={({ field }) => <FormItem><FormLabel>Category</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl><SelectContent>
+                                    <SelectItem value="Pain Relief">Pain Relief</SelectItem>
+                                    <SelectItem value="Antibiotics">Antibiotics</SelectItem>
+                                    <SelectItem value="Antiseptics">Antiseptics</SelectItem>
+                                    <SelectItem value="Vitamins & Supplements">Vitamins & Supplements</SelectItem>
+                                    <SelectItem value="Allergy & Hayfever">Allergy & Hayfever</SelectItem>
+                                    <SelectItem value="Cold & Flu">Cold & Flu</SelectItem>
+                                    <SelectItem value="Digestive Health">Digestive Health</SelectItem>
+                                    <SelectItem value="Skin Care">Skin Care</SelectItem>
+                                    <SelectItem value="Unassigned">Unassigned</SelectItem>
+                                </SelectContent></Select><FormMessage /></FormItem>} />
                             </div>
                         </ScrollArea>
 
