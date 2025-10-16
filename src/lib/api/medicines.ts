@@ -43,7 +43,10 @@ export const deleteMedicine = async (id: number) => {
 
 export const deleteMultipleMedicines = async (ids: number[]) => {
     const payload: MedicineBulkDelete = { medicine_ids: ids }
-    await api.delete("/api/v1/medicines/bulk", { data: payload })
+    console.log(payload)
+    await api.delete("/api/v1/medicines/bulk", {
+        data: payload
+    })
 }
 
 export const getMedicineQuote = async (id: number, quantity: number): Promise<MedicineQuote> => {

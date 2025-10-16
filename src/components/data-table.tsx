@@ -3,6 +3,7 @@ import {
     type ColumnDef,
     type ColumnFiltersState,
     type SortingState,
+    type RowSelectionState,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
@@ -25,8 +26,10 @@ import { Input } from "@/components/ui/input"
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
-    filterColumnId: string
-    filterColumnPlaceholder: string
+    filterColumnId?: string
+    filterColumnPlaceholder?: string
+    rowSelection: RowSelectionState
+    setRowSelection: React.Dispatch<React.SetStateAction<RowSelectionState>>
 }
 
 export function DataTable<TData, TValue>({
@@ -34,6 +37,8 @@ export function DataTable<TData, TValue>({
     data,
     filterColumnId,
     filterColumnPlaceholder,
+    rowSelection,
+    setRowSelection,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -47,24 +52,29 @@ export function DataTable<TData, TValue>({
         getSortedRowModel: getSortedRowModel(),
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
+        onRowSelectionChange: setRowSelection,
+        enableRowSelection: true, // Explicitly enable row selection
         state: {
             sorting,
             columnFilters,
+            rowSelection,
         },
     })
 
     return (
         <div>
-            <div className="flex items-center py-4">
-                <Input
-                    placeholder={filterColumnPlaceholder}
-                    value={(table.getColumn(filterColumnId)?.getFilterValue() as string) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn(filterColumnId)?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm"
-                />
-            </div>
+            {filterColumnId && filterColumnPlaceholder && (
+                <div className="flex items-center py-4">
+                    <Input
+                        placeholder={filterColumnPlaceholder}
+                        value={(table.getColumn(filterColumnId)?.getFilterValue() as string) ?? ""}
+                        onChange={(event) =>
+                            table.getColumn(filterColumnId)?.setFilterValue(event.target.value)
+                        }
+                        className="max-w-sm"
+                    />
+                </div>
+            )}
             <div className="rounded-md border">
                 <Table style={{ tableLayout: "auto" }}>
                     <TableHeader>
