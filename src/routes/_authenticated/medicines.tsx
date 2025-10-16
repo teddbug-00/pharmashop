@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { getMedicines, deleteMultipleMedicines } from "@/lib/api/medicines"
 import type { components } from "@/lib/api/schema"
 import { DataTable } from "@/components/data-table"
-import type { ColumnDef } from "@tanstack/react-table"
+import type { ColumnDef, RowSelectionState } from "@tanstack/react-table"
 import { ArrowUpDown, Trash2, XCircle, Filter } from "lucide-react"
 import { toast } from "sonner"
 
@@ -57,8 +57,11 @@ const columns: ColumnDef<Medicine>[] = [
         header: ({ table }) => (
             <Checkbox
                 checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
+                    table.getIsAllPageRowsSelected()
+                        ? true
+                        : table.getIsSomePageRowsSelected()
+                            ? "indeterminate"
+                            : false
                 }
                 onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                 aria-label="Select all"
@@ -66,7 +69,7 @@ const columns: ColumnDef<Medicine>[] = [
         ),
         cell: ({ row }) => (
             <Checkbox
-                checked={row.getIsSelected()}
+                checked={!!row.getIsSelected()}
                 onCheckedChange={(value) => row.toggleSelected(!!value)}
                 aria-label="Select row"
             />
@@ -132,7 +135,7 @@ export const Route = createFileRoute("/_authenticated/medicines")({
 
 function MedicinesComponent() {
     const queryClient = useQueryClient()
-    const [rowSelection, setRowSelection] = React.useState({})
+    const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
     const [filters, setFilters] = React.useState<MedicineFilters>({
         category: undefined,
         form: undefined,
@@ -161,13 +164,6 @@ function MedicinesComponent() {
             })
         },
     })
-
-    const handleDeleteSelected = () => {
-        const selectedMedicineIds = Object.keys(rowSelection).map(Number)
-        if (selectedMedicineIds.length > 0) {
-            deleteMedicinesMutation.mutate(selectedMedicineIds)
-        }
-    }
 
     const handleClearFilters = () => {
         setFilters({ category: undefined, form: undefined, brand: undefined, name: undefined });
@@ -211,6 +207,41 @@ function MedicinesComponent() {
             return matches;
         });
     }, [allMedicinesData, filters.category, filters.form, debouncedBrandFilter, debouncedNameFilter]);
+
+    // Synchronize rowSelection with filteredMedicines to remove stale selections
+    React.useEffect(() => {
+        // If data is loading or there are no medicines, clear selections
+        if (isLoadingMedicines || !allMedicinesData || allMedicinesData.length === 0) {
+            if (Object.keys(rowSelection).length > 0) {
+                setRowSelection({});
+            }
+            return;
+        }
+
+        const currentFilteredMedicineIds = new Set(filteredMedicines.map(m => String(m.id)));
+        const newRowSelection: RowSelectionState = {};
+        let selectionChanged = false;
+
+        for (const selectedId in rowSelection) {
+            if (currentFilteredMedicineIds.has(selectedId)) {
+                newRowSelection[selectedId] = true;
+            } else {
+                selectionChanged = true; // This selectedId is no longer in the filtered data
+            }
+        }
+
+        // Update state only if a change occurred to prevent unnecessary re-renders
+        if (selectionChanged) {
+            setRowSelection(newRowSelection);
+        }
+    }, [filteredMedicines, isLoadingMedicines, allMedicinesData]); // Add isLoadingMedicines and allMedicinesData to dependencies
+
+    const handleDeleteSelected = () => {
+        const selectedMedicineIds = Object.keys(rowSelection).map(Number);
+        if (selectedMedicineIds.length > 0) {
+            deleteMedicinesMutation.mutate(selectedMedicineIds)
+        }
+    }
 
     return (
         <div className="space-y-4">

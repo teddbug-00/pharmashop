@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends { id: number | string }, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
     filterColumnId?: string
@@ -32,7 +32,7 @@ interface DataTableProps<TData, TValue> {
     setRowSelection: React.Dispatch<React.SetStateAction<RowSelectionState>>
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { id: number | string }, TValue>({
     columns,
     data,
     filterColumnId,
@@ -53,7 +53,8 @@ export function DataTable<TData, TValue>({
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         onRowSelectionChange: setRowSelection,
-        enableRowSelection: true, // Explicitly enable row selection
+        enableRowSelection: true,
+        getRowId: (row) => String(row.id), // Use the actual medicine ID as the row ID
         state: {
             sorting,
             columnFilters,
