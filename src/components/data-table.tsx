@@ -1,17 +1,14 @@
 import * as React from "react"
-import type {
-    ColumnDef,
-    SortingState,
-    RowSelectionState,
-    ColumnFiltersState,
-} from "@tanstack/react-table"
 import {
+    ColumnDef,
+    ColumnFiltersState,
+    SortingState,
     flexRender,
     getCoreRowModel,
+    getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
-    getFilteredRowModel,
 } from "@tanstack/react-table"
 
 import {
@@ -26,19 +23,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[]
-    data: TData[]
-    rowSelection?: RowSelectionState
-    setRowSelection?: React.Dispatch<React.SetStateAction<RowSelectionState>>
-    filterColumnId?: string;
-    filterColumnPlaceholder?: string;
+    columns: ColumnDef<TData, TValue>[],
+    data: TData[],
+    filterColumnId: string,
+    filterColumnPlaceholder: string,
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
-    rowSelection,
-    setRowSelection,
     filterColumnId,
     filterColumnPlaceholder,
 }: DataTableProps<TData, TValue>) {
@@ -52,35 +45,28 @@ export function DataTable<TData, TValue>({
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
-        ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         state: {
             sorting,
-            rowSelection: rowSelection || {}, 
             columnFilters,
         },
-        enableRowSelection: !!rowSelection,
     })
-
-    const rows = table.getRowModel().rows || [];
 
     return (
         <div>
-            {filterColumnId && (
-                <div className="flex items-center py-4">
-                    <Input
-                        placeholder={filterColumnPlaceholder || `Filter ${filterColumnId}...`}
-                        value={(table.getColumn(filterColumnId)?.getFilterValue() as string) ?? ""}
-                        onChange={(event) =>
-                            table.getColumn(filterColumnId)?.setFilterValue(event.target.value)
-                        }
-                        className="max-w-sm"
-                    />
-                </div>
-            )}
+            <div className="flex items-center py-4">
+                <Input
+                    placeholder={filterColumnPlaceholder}
+                    value={(table.getColumn(filterColumnId)?.getFilterValue() as string) ?? ""}
+                    onChange={(event) =>
+                        table.getColumn(filterColumnId)?.setFilterValue(event.target.value)
+                    }
+                    className="max-w-sm"
+                />
+            </div>
             <div className="rounded-md border">
-                <Table>
+                <Table style={{ tableLayout: "auto" }}>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
@@ -100,20 +86,15 @@ export function DataTable<TData, TValue>({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {rows.length > 0 ? (
-                            rows.map((row) => (
+                        {table.getRowModel().rows?.length ? (
+                            table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}
-                                    {...(table.options.enableRowSelection && {
-                                        'data-state': row.getIsSelected() ? 'selected' : undefined,
-                                    })}
+                                    data-state={row.getIsSelected() && "selected"}
                                 >
-                                    {row.getVisibleCells()?.map((cell) => ( // Added null-check here
+                                    {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
-                                            )}
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
                                 </TableRow>

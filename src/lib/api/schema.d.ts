@@ -684,8 +684,8 @@ export interface components {
             sale_date: string;
             /** Total Amount */
             total_amount: string;
-            /** Sold By Username */
-            sold_by_username: string;
+            /** Sold By Full Name */
+            sold_by_full_name: string;
         };
         /** SaleItemCreate */
         SaleItemCreate: {
@@ -719,8 +719,8 @@ export interface components {
             /** Total Amount */
             total_amount: string;
             payment_method: components["schemas"]["PaymentMethod"];
-            /** Sold By Username */
-            sold_by_username: string;
+            /** Sold By Full Name */
+            sold_by_full_name: string;
             /** Items */
             items: components["schemas"]["SaleItemReceipt"][];
         };
