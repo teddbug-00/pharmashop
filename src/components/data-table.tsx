@@ -1,8 +1,8 @@
 import * as React from "react"
 import {
-    ColumnDef,
-    ColumnFiltersState,
-    SortingState,
+    type ColumnDef,
+    type ColumnFiltersState,
+    type SortingState,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
@@ -23,10 +23,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[],
-    data: TData[],
-    filterColumnId: string,
-    filterColumnPlaceholder: string,
+    columns: ColumnDef<TData, TValue>[]
+    data: TData[]
+    filterColumnId: string
+    filterColumnPlaceholder: string
 }
 
 export function DataTable<TData, TValue>({

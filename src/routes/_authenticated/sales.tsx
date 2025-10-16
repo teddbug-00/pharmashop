@@ -208,7 +208,7 @@ function SalesComponent() {
                                 </Table>
                             </div>
                             <div className="text-right text-lg font-bold">
-                                Total: GHS {parseFloat(selectedSale.total_amount).toFixed(2)}
+                                Total: GH₵ {parseFloat(selectedSale.total_amount).toFixed(2)}
                             </div>
                         </div>
                     )}
