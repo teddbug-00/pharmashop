@@ -14,7 +14,6 @@ import { Toaster } from "@/components/ui/sonner"
 
 const queryClient = new QueryClient()
 
-// Define the shape of the context we expect from the router
 interface RouterContext {
     auth?: ReturnType<typeof useAuth>
 }
@@ -32,19 +31,18 @@ function RootComponent() {
         >
             <QueryClientProvider client={queryClient}>
                 <AuthProvider>
-                    <RouterUpdater />
+                    <AuthDependentContent />
                 </AuthProvider>
             </QueryClientProvider>
         </ThemeProvider>
     )
 }
 
-// This will update the router context whenever auth state changes
-function RouterUpdater() {
+function AuthDependentContent() {
     const auth = useAuth()
     const router = useRouter()
 
-    // Use an effect to update the router\'s context
+    // Effect to update the router's context with auth state
     React.useEffect(() => {
         router.update({
             context: {
@@ -53,6 +51,21 @@ function RouterUpdater() {
             },
         })
     }, [auth, router])
+
+    // Effect to handle redirection after successful login
+    React.useEffect(() => {
+        if (!auth.loading && auth.isAuthenticated && router.state.location.pathname === '/login') {
+            const searchParams = new URLSearchParams(router.state.location.search);
+            const redirect = searchParams.get('redirect');
+            console.log("AuthDependentContent: Authenticated and on login page. Redirecting to", redirect || '/');
+            router.navigate({ to: redirect || '/', replace: true });
+        }
+    }, [auth.isAuthenticated, auth.loading, router, router.state.location.pathname, router.state.location.search]);
+
+
+    if (auth.loading) {
+        return <div>Loading application...</div>
+    }
 
     return (
         <>

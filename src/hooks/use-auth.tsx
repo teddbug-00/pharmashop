@@ -13,6 +13,7 @@ interface AuthContextType {
     logout: () => void
     accessToken: string | null;
     refreshToken: string | null;
+    loading: boolean;
 }
 
 export const AuthContext = React.createContext<AuthContextType | null>(null)
@@ -34,6 +35,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [refreshToken, setRefreshToken] = React.useState<string | null>(null)
     const [user, setUser] = React.useState<User | null>(null)
     const [isAuthenticated, setIsAuthenticated] = React.useState(false)
+    const [loading, setLoading] = React.useState(true);
 
     const login = React.useCallback((newAccessToken: string, newRefreshToken: string, newUser: User) => {
         localStorage.setItem("accessToken", newAccessToken)
@@ -69,9 +71,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 setRefreshToken(storedRefreshToken)
                 setUser(parsedUser)
                 setIsAuthenticated(true)
+                console.log("AuthProvider: Initial load - isAuthenticated set to TRUE.");
             } catch (e) {
                 console.error("AuthProvider: Error parsing stored user or tokens from localStorage. Clearing data.", e);
-                // Clear invalid data if parsing fails
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("refreshToken");
                 localStorage.removeItem("user");
@@ -79,14 +81,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 setRefreshToken(null);
                 setUser(null);
                 setIsAuthenticated(false);
+                console.log("AuthProvider: Initial load - isAuthenticated set to FALSE due to parsing error.");
             }
         } else {
-            // If any part is missing, ensure all are cleared to prevent partial state
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");
             localStorage.removeItem("user");
+            setIsAuthenticated(false);
+            console.log("AuthProvider: Initial load - isAuthenticated set to FALSE (missing tokens).");
         }
-    }, [login, logout]) // Added login and logout to dependency array
+        setLoading(false); // Set loading to false after initial check
+    }, [login, logout])
 
     // Axios Interceptor for automatic token refresh
     React.useEffect(() => {
@@ -114,7 +119,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                         return Promise.reject(error)
                     }
                 } else if (decodedToken.exp < currentTime && !refreshToken) {
-                    // Access token expired, but no refresh token available
                     logout();
                     return Promise.reject(new Error("Access token expired and no refresh token available."));
                 }
@@ -140,9 +144,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
             logout,
             accessToken,
             refreshToken,
+            loading,
         }),
-        [isAuthenticated, user, login, logout, accessToken, refreshToken],
+        [isAuthenticated, user, login, logout, accessToken, refreshToken, loading],
     )
+
+    if (loading) {
+        return <div>Loading authentication provider...</div>; // Render loading state directly in AuthProvider
+    }
 
     return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
 }

@@ -79,7 +79,7 @@ function LoginComponent() {
 
             auth.login(data.access_token, data.refresh_token, userToLogin)
 
-            // Removed direct navigate call here
+            // Navigation will now be handled in __root.tsx
         },
         onError: (error) => {
             // You can handle login errors here, e.g., show a toast notification
@@ -89,13 +89,6 @@ function LoginComponent() {
             })
         },
     })
-
-    // Add a useEffect to navigate once authentication is confirmed
-    React.useEffect(() => {
-        if (auth.isAuthenticated) {
-            navigate({ to: redirect || '/', replace: true });
-        }
-    }, [auth.isAuthenticated, navigate, redirect]);
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         loginMutation.mutate(values)

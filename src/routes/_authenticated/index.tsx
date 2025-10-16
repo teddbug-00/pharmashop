@@ -16,46 +16,35 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import {
-    AlertTriangle,
     ArrowUpRight,
-    Clock,
     DollarSign,
     Users,
+    Tag, // New icon for Sales by Category
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getDashboardStats } from "@/lib/api/dashboard"
-import { getSales } from "@/lib/api/sales"
+// import { getDashboardStats } from "@/lib/api/dashboard" // No longer fetching directly here
+import * as React from "react";
 
 export const Route = createFileRoute("/_authenticated/")({
     component: DashboardPage,
 })
 
 function DashboardPage() {
-    // --- LIVE DATA FETCHING ---
-    const { data: statsData, isLoading: isLoadingStats } = useQuery({
-        queryKey: ["dashboardStats"],
-        queryFn: () => getDashboardStats(),
-    })
+    // Retrieve statsData and isLoadingStats from the context provided by AuthenticatedLayout
+    const { statsData, isLoadingStats } = Route.useRouteContext();
 
-    const { data: salesData, isLoading: isLoadingSales } = useQuery({
-        queryKey: ["recentSales"],
-        // Fetch the 5 most recent sales
-        queryFn: () => getSales(0, 5),
-    })
-
-    // --- SAMPLE DATA (for widgets without a current API endpoint) ---
-    const topProducts = [
-        { name: "Paracetamol 500mg", sold: 120, stock: 80 },
-        { name: "Amoxicillin 250mg", sold: 98, stock: 22 },
-        { name: "Vitamin C 1000mg", sold: 85, stock: 150 },
-    ]
+    const salesData = statsData?.recent_sales;
+    const isLoadingSales = isLoadingStats;
+    const topProducts = statsData?.top_selling_products;
+    const salesByCategory = statsData?.sales_by_category;
 
     return (
         <div className="flex flex-1 flex-col gap-4">
-            <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4">
+                {/* Today's Revenue */}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
@@ -68,7 +57,7 @@ function DashboardPage() {
                             <Skeleton className="h-8 w-3/4" />
                         ) : (
                             <div className="text-2xl font-bold">
-                                GHS {statsData?.total_sales_today ?? "0.00"}
+                                GHS {statsData?.sales_today?.total_revenue ?? "0.00"}
                             </div>
                         )}
                         <p className="text-xs text-muted-foreground">
@@ -76,68 +65,53 @@ function DashboardPage() {
                         </p>
                     </CardContent>
                 </Card>
+
+                {/* Last 7 Days Revenue */}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Total Medicines
+                            Last 7 Days Revenue
                         </CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         {isLoadingStats ? (
-                            <Skeleton className="h-8 w-1/2" />
+                            <Skeleton className="h-8 w-3/4" />
                         ) : (
                             <div className="text-2xl font-bold">
-                                {statsData?.total_medicines ?? 0}
+                                GHS {statsData?.sales_last_7_days?.total_revenue ?? "0.00"}
                             </div>
                         )}
                         <p className="text-xs text-muted-foreground">
-                            Unique products in inventory
+                            Total sales over last 7 days
                         </p>
                     </CardContent>
                 </Card>
-                <Link to="/reports/low-stock">
-                    <Card className="hover:bg-muted/50 transition-colors">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
-                            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            {isLoadingStats ? (
-                                <Skeleton className="h-8 w-1/2" />
-                            ) : (
-                                <div className="text-2xl font-bold">
-                                    {statsData?.low_stock_items_count ?? 0}
-                                </div>
-                            )}
-                            <p className="text-xs text-muted-foreground">
-                                Items below stock threshold
-                            </p>
-                        </CardContent>
-                    </Card>
-                </Link>
-                <Link to="/reports/expiring-soon">
-                    <Card className="hover:bg-muted/50 transition-colors">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Expiring Soon
-                            </CardTitle>
-                            <Clock className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            {isLoadingStats ? (
-                                <Skeleton className="h-8 w-1/2" />
-                            ) : (
-                                <div className="text-2xl font-bold">
-                                    {statsData?.expiring_soon_items_count ?? 0}
-                                </div>
-                            )}
-                            <p className="text-xs text-muted-foreground">
-                                Batches expiring in next 30 days
-                            </p>
-                        </CardContent>
-                    </Card>
-                </Link>
+
+                {/* Last 30 Days Revenue */}
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Last 30 Days Revenue
+                        </CardTitle>
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        {isLoadingStats ? (
+                            <Skeleton className="h-8 w-3/4" />
+                        ) : (
+                            <div className="text-2xl font-bold">
+                                GHS {statsData?.sales_last_30_days?.total_revenue ?? "0.00"}
+                            </div>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                            Total sales over last 30 days
+                        </p>
+                    </CardContent>
+                </Card>
+
+                {/* Removed Total Medicines Card */}
+                {/* Removed Low Stock, Expiring Soon, Expired Batches, Out of Stock Cards */}
             </div>
             <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
                 <Card className="xl:col-span-2">
@@ -198,8 +172,8 @@ function DashboardPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-6">
-                        {topProducts.map((product) => (
-                            <div key={product.name} className="flex items-center gap-4">
+                        {topProducts?.map((product) => (
+                            <div key={product.medicine_id} className="flex items-center gap-4">
                                 <Avatar className="hidden h-9 w-9 sm:flex">
                                     <AvatarImage src="/placeholder.svg" alt="Avatar" />
                                     <AvatarFallback>
@@ -211,13 +185,56 @@ function DashboardPage() {
                                         {product.name}
                                     </p>
                                     <div className="flex items-center gap-2">
-                                        <Progress value={(product.stock / (product.stock + product.sold)) * 100} className="h-2" />
-                                        <span className="text-xs text-muted-foreground">{product.stock} left</span>
+                                        {/* Progress bar logic might need adjustment based on available data */}
+                                        <Progress value={product.total_quantity_sold} className="h-2" />
+                                        <span className="text-xs text-muted-foreground">{product.total_quantity_sold} sold</span>
                                     </div>
                                 </div>
-                                <div className="ml-auto font-medium">+{product.sold} sold</div>
+                                <div className="ml-auto font-medium">+{product.total_quantity_sold} sold</div>
                             </div>
                         ))}
+                    </CardContent>
+                </Card>
+                {/* Sales by Category Card */}
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div className="grid gap-2">
+                            <CardTitle>Sales by Category</CardTitle>
+                            <CardDescription>
+                                Revenue breakdown by medicine category.
+                            </CardDescription>
+                        </div>
+                        <Tag className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        {isLoadingStats ? (
+                            <div className="space-y-4">
+                                <Skeleton className="h-10 w-full" />
+                                <Skeleton className="h-10 w-full" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        ) : (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Category</TableHead>
+                                        <TableHead className="text-right">Revenue</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {salesByCategory?.map((category) => (
+                                        <TableRow key={category.category_name}>
+                                            <TableCell>
+                                                <div className="font-medium">{category.category_name}</div>
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                GHS {parseFloat(category.total_revenue).toFixed(2)}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        )}
                     </CardContent>
                 </Card>
             </div>
