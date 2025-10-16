@@ -181,7 +181,7 @@ function DashboardPage() {
                                                 {new Date(sale.sale_date).toLocaleDateString()}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                GHS {sale.total_amount.toFixed(2)}
+                                                GHS {parseFloat(sale.total_amount).toFixed(2)}
                                             </TableCell>
                                         </TableRow>
                                     ))}

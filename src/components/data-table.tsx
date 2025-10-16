@@ -3,6 +3,7 @@ import type {
     ColumnDef,
     SortingState,
     RowSelectionState,
+    ColumnFiltersState,
 } from "@tanstack/react-table"
 import {
     flexRender,
@@ -10,6 +11,7 @@ import {
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
+    getFilteredRowModel,
 } from "@tanstack/react-table"
 
 import {
@@ -21,12 +23,15 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
-    rowSelection: RowSelectionState
-    setRowSelection: React.Dispatch<React.SetStateAction<RowSelectionState>>
+    rowSelection?: RowSelectionState
+    setRowSelection?: React.Dispatch<React.SetStateAction<RowSelectionState>>
+    filterColumnId?: string;
+    filterColumnPlaceholder?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -34,8 +39,11 @@ export function DataTable<TData, TValue>({
     data,
     rowSelection,
     setRowSelection,
+    filterColumnId,
+    filterColumnPlaceholder,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([])
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
 
     const table = useReactTable({
         data,
@@ -44,16 +52,33 @@ export function DataTable<TData, TValue>({
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
-        onRowSelectionChange: setRowSelection,
+        ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
+        onColumnFiltersChange: setColumnFilters,
+        getFilteredRowModel: getFilteredRowModel(),
         state: {
             sorting,
-            rowSelection,
+            rowSelection: rowSelection || {}, 
+            columnFilters,
         },
-        enableRowSelection: true,
+        enableRowSelection: !!rowSelection,
     })
+
+    const rows = table.getRowModel().rows || [];
 
     return (
         <div>
+            {filterColumnId && (
+                <div className="flex items-center py-4">
+                    <Input
+                        placeholder={filterColumnPlaceholder || `Filter ${filterColumnId}...`}
+                        value={(table.getColumn(filterColumnId)?.getFilterValue() as string) ?? ""}
+                        onChange={(event) =>
+                            table.getColumn(filterColumnId)?.setFilterValue(event.target.value)
+                        }
+                        className="max-w-sm"
+                    />
+                </div>
+            )}
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
@@ -75,13 +100,15 @@ export function DataTable<TData, TValue>({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
+                        {rows.length > 0 ? (
+                            rows.map((row) => (
                                 <TableRow
                                     key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
+                                    {...(table.options.enableRowSelection && {
+                                        'data-state': row.getIsSelected() ? 'selected' : undefined,
+                                    })}
                                 >
-                                    {row.getVisibleCells().map((cell) => (
+                                    {row.getVisibleCells()?.map((cell) => ( // Added null-check here
                                         <TableCell key={cell.id}>
                                             {flexRender(
                                                 cell.column.columnDef.cell,

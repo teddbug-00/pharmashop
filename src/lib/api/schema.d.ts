@@ -183,6 +183,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/medicines/{medicine_id}/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a price quote for a given quantity of a medicine
+         * @description Provides a price quote for a given quantity of a medicine.
+         */
+        get: operations["get_medicine_quote_api_v1_medicines__medicine_id__quote_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/medicines/{medicine_id}/batches": {
         parameters: {
             query?: never;
@@ -599,6 +619,17 @@ export interface components {
             total_quantity: number;
             /** Earliest Expiry */
             earliest_expiry: string | null;
+        };
+        /** MedicineQuote */
+        MedicineQuote: {
+            /** Medicine Id */
+            medicine_id: number;
+            /** Requested Quantity */
+            requested_quantity: number;
+            /** Effective Total Price */
+            effective_total_price: string;
+            /** Quantity Available */
+            quantity_available: number;
         };
         /** MedicineUpdate */
         MedicineUpdate: {
@@ -1244,6 +1275,41 @@ export interface operations {
             };
         };
     };
+    get_medicine_quote_api_v1_medicines__medicine_id__quote_get: {
+        parameters: {
+            query: {
+                /** @description The number of units to buy. */
+                quantity: number;
+                required_token_type?: string;
+            };
+            header?: never;
+            path: {
+                medicine_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MedicineQuote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     add_new_batch_to_medicine_api_v1_medicines__medicine_id__batches_post: {
         parameters: {
             query?: never;
@@ -1284,7 +1350,6 @@ export interface operations {
             query?: {
                 skip?: number;
                 limit?: number;
-                required_token_type?: string;
             };
             header?: never;
             path?: never;
@@ -1314,9 +1379,7 @@ export interface operations {
     };
     create_new_sale_api_v1_sales__post: {
         parameters: {
-            query?: {
-                required_token_type?: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -1349,9 +1412,7 @@ export interface operations {
     };
     get_sale_by_id_api_v1_sales__sale_id__get: {
         parameters: {
-            query?: {
-                required_token_type?: string;
-            };
+            query?: never;
             header?: never;
             path: {
                 sale_id: number;

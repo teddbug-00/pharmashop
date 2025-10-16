@@ -1,18 +1,18 @@
 import * as React from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createSale } from "@/lib/api/sales"
-import { getMedicines } from "@/lib/api/medicines"
-import type { components, paths } from "@/lib/api/schema";
+import { getMedicines, getMedicineQuote } from "@/lib/api/medicines"
+import type { components } from "@/lib/api/schema";
 import { Check, ChevronsUpDown, Minus, Plus, PlusCircle, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
-    DialogContent,
     DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogContent,
 } from "@/components/ui/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
@@ -33,9 +33,11 @@ type Medicine = components["schemas"]["MedicineInList"]
 type SaleItem = {
     medicine: Medicine
     quantity: number
+    subtotal: number
 }
-// This type will need to be updated in your schema.d.ts when the backend changes
-type SaleCreateWithPayment = paths["/sales/"]["post"]["requestBody"]["content"]["application/json"]["schema"] & { payment_method?: "cash" | "mobile_money" };
+
+type SaleCreate = components["schemas"]["SaleCreate"]
+type PaymentMethod = components["schemas"]["PaymentMethod"]
 
 export function NewSaleDialog() {
     const queryClient = useQueryClient()
@@ -46,17 +48,16 @@ export function NewSaleDialog() {
     )
     const [quantity, setQuantity] = React.useState(1)
     const [isComboboxOpen, setIsComboboxOpen] = React.useState(false)
-    const [paymentMethod, setPaymentMethod] = React.useState<"cash" | "mobile_money">("cash")
+    const [paymentMethod, setPaymentMethod] = React.useState<PaymentMethod>("CASH")
     const quantityInputRef = React.useRef<HTMLInputElement>(null)
 
-    // Reset state when the dialog is closed
     React.useEffect(() => {
         if (!isDialogOpen) {
-            // Delay reset to avoid visual flicker as dialog closes
             const timer = setTimeout(() => {
                 setSaleItems([])
                 setSelectedMedicine(null)
                 setQuantity(1)
+                setPaymentMethod("CASH")
             }, 150)
             return () => clearTimeout(timer)
         }
@@ -64,20 +65,48 @@ export function NewSaleDialog() {
 
     const { data: medicines } = useQuery({
         queryKey: ["medicines"],
-        queryFn: () => getMedicines(), // Correctly wrap the function call
-        enabled: isDialogOpen, // Only fetch medicines when the dialog is open
+        queryFn: () => getMedicines(),
+        enabled: isDialogOpen,
     })
+
+    const quoteMutation = useMutation({
+        mutationFn: getMedicineQuote,
+        onSuccess: (data) => {
+            const { medicine_id, requested_quantity, effective_total_price } = data;
+            const medicine = medicines?.find(m => m.id === medicine_id);
+            if (!medicine) return;
+
+            const existingItemIndex = saleItems.findIndex(
+                (item) => item.medicine.id === medicine_id,
+            );
+
+            const subtotal = parseFloat(effective_total_price);
+
+            if (existingItemIndex > -1) {
+                const updatedItems = [...saleItems]
+                updatedItems[existingItemIndex].quantity = requested_quantity;
+                updatedItems[existingItemIndex].subtotal = subtotal;
+                setSaleItems(updatedItems)
+            } else {
+                setSaleItems([
+                    ...saleItems,
+                    { medicine, quantity: requested_quantity, subtotal },
+                ])
+            }
+            setSelectedMedicine(null)
+            setQuantity(1)
+        },
+        onError: (error) => {
+            toast.error("Failed to get price quote", { description: error.message })
+        },
+    });
 
     const createSaleMutation = useMutation({
         mutationFn: createSale,
         onSuccess: async () => {
             await queryClient.invalidateQueries({queryKey: ["sales"]})
-            await queryClient.invalidateQueries({queryKey: ["dashboard"]})  // Invalidate dashboard stats too
+            await queryClient.invalidateQueries({queryKey: ["dashboard"]})
             setIsDialogOpen(false)
-            // Reset state for next time
-            setSaleItems([])
-            setSelectedMedicine(null)
-            setQuantity(1)
             toast.success("Sale created successfully!")
         },
         onError: (error) => {
@@ -89,35 +118,15 @@ export function NewSaleDialog() {
     const handleAddItem = () => {
         if (!selectedMedicine || quantity <= 0) return
 
-        // --- STOCK VALIDATION ---
         if (quantity > selectedMedicine.total_quantity) {
             toast.error("Not enough stock", { description: `Only ${selectedMedicine.total_quantity} units of ${selectedMedicine.name} available.` })
             return
         }
 
-        const existingItemIndex = saleItems.findIndex(
-            (item) => item.medicine.id === selectedMedicine.id,
-        )
+        const existingItem = saleItems.find(item => item.medicine.id === selectedMedicine.id);
+        const newQuantity = (existingItem?.quantity || 0) + quantity;
 
-        if (existingItemIndex > -1) {
-            const updatedItems = [...saleItems]
-            const newQuantity = updatedItems[existingItemIndex].quantity + quantity
-            // --- STOCK VALIDATION ON UPDATE ---
-            if (newQuantity > updatedItems[existingItemIndex].medicine.total_quantity) {
-                toast.error("Not enough stock", { description: `Cannot add ${quantity} more units. Only ${updatedItems[existingItemIndex].medicine.total_quantity} total units available.` })
-                return
-            }
-            updatedItems[existingItemIndex].quantity = newQuantity
-            setSaleItems(updatedItems)
-        } else {
-            setSaleItems([
-                ...saleItems,
-                { medicine: selectedMedicine, quantity: quantity },
-            ])
-        }
-
-        setSelectedMedicine(null)
-        setQuantity(1)
+        quoteMutation.mutate({ medicineId: selectedMedicine.id, quantity: newQuantity });
     }
 
     const handleRemoveItem = (medicineId: number) => {
@@ -125,29 +134,25 @@ export function NewSaleDialog() {
     }
 
     const handleUpdateQuantity = (medicineId: number, newQuantity: number) => {
-        const itemIndex = saleItems.findIndex((item) => item.medicine.id === medicineId)
-        if (itemIndex === -1) return
+        if (newQuantity <= 0) {
+            handleRemoveItem(medicineId);
+            return;
+        }
+        const medicine = medicines?.find(m => m.id === medicineId);
+        if (!medicine) return;
 
-        // --- STOCK VALIDATION ON EDIT ---
-        if (newQuantity > saleItems[itemIndex].medicine.total_quantity) {
-            toast.error("Not enough stock", { description: `Only ${saleItems[itemIndex].medicine.total_quantity} units available.` })
+        if (newQuantity > medicine.total_quantity) {
+            toast.error("Not enough stock", { description: `Only ${medicine.total_quantity} units available.` })
             return
         }
 
-        // Prevent quantity from going below 0
-        if (newQuantity < 0) {
-            return
-        }
-
-        const updatedItems = [...saleItems]
-        updatedItems[itemIndex].quantity = newQuantity
-        setSaleItems(updatedItems)
+        quoteMutation.mutate({ medicineId, quantity: newQuantity });
     }
 
     const handleSubmitSale = () => {
         if (saleItems.length === 0) return
 
-        const saleToCreate: SaleCreateWithPayment = {
+        const saleToCreate: SaleCreate = {
             items: saleItems.map((item) => ({
                 medicine_id: item.medicine.id,
                 quantity: item.quantity,
@@ -157,10 +162,7 @@ export function NewSaleDialog() {
         createSaleMutation.mutate(saleToCreate)
     }
 
-    const totalAmount = saleItems.reduce(
-        (total, item) => total + parseFloat(item.medicine.selling_price) * item.quantity,
-        0,
-    )
+    const totalAmount = saleItems.reduce((total, item) => total + item.subtotal, 0)
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -203,7 +205,6 @@ export function NewSaleDialog() {
                                                         onSelect={() => {
                                                             setSelectedMedicine(medicine)
                                                             setIsComboboxOpen(false)
-                                                            // Focus the quantity input for a faster workflow
                                                             setTimeout(() => {
                                                                 quantityInputRef.current?.focus()
                                                             }, 0)
@@ -245,8 +246,8 @@ export function NewSaleDialog() {
                                 min="1"
                             />
                         </div>
-                        <Button onClick={handleAddItem} disabled={!selectedMedicine}>
-                            Add
+                        <Button onClick={handleAddItem} disabled={!selectedMedicine || quoteMutation.isPending}>
+                            {quoteMutation.isPending ? "..." : "Add"}
                         </Button>
                     </div>
                     <div className="relative max-h-[250px] overflow-auto rounded-md border">
@@ -271,7 +272,6 @@ export function NewSaleDialog() {
                                                         variant="ghost"
                                                         size="icon-sm"
                                                         onClick={() => handleUpdateQuantity(item.medicine.id, item.quantity - 1)}
-                                                        disabled={item.quantity === 0}
                                                     >
                                                         <Minus className="h-3.5 w-3.5" />
                                                     </Button>
@@ -281,17 +281,13 @@ export function NewSaleDialog() {
                                                         variant="ghost"
                                                         size="icon-sm"
                                                         onClick={() => handleUpdateQuantity(item.medicine.id, item.quantity + 1)}
-                                                        disabled={item.quantity >= item.medicine.total_quantity}
                                                     >
                                                         <Plus className="h-4 w-4" />
                                                     </Button>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                {(
-                                                    parseFloat(item.medicine.selling_price) *
-                                                    item.quantity
-                                                ).toFixed(2)}
+                                                {item.subtotal.toFixed(2)}
                                             </TableCell>
                                             <TableCell>
                                                 <Button
@@ -317,15 +313,15 @@ export function NewSaleDialog() {
                     <div className="space-y-2">
                         <ToggleGroup
                             type="single"
-                            defaultValue="cash"
+                            defaultValue="CASH"
                             variant="outline"
                             className="w-full justify-start"
-                            onValueChange={(value: "cash" | "mobile_money") => {
+                            onValueChange={(value: PaymentMethod) => {
                                 if (value) setPaymentMethod(value)
                             }}
                         >
-                            <ToggleGroupItem value="cash">Cash</ToggleGroupItem>
-                            <ToggleGroupItem value="mobile_money">Mobile Money</ToggleGroupItem>
+                            <ToggleGroupItem value="CASH">Cash</ToggleGroupItem>
+                            <ToggleGroupItem value="MOMO">Mobile Money</ToggleGroupItem>
                         </ToggleGroup>
                     </div>
                     <div className="text-right text-lg font-bold">

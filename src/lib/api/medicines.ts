@@ -6,6 +6,7 @@ type MedicineCreate = components["schemas"]["MedicineCreate"]
 type MedicineUpdate = components["schemas"]["MedicineUpdate"]
 type MedicineBatchCreate = components["schemas"]["MedicineBatchCreate"]
 type MedicinePublic = components["schemas"]["MedicinePublic"]
+type MedicineQuote = components["schemas"]["MedicineQuote"]
 
 export const getMedicines = async (
     skip: number = 0,
@@ -14,6 +15,22 @@ export const getMedicines = async (
     const response = await api.get<MedicineInList[]>("/api/v1/medicines/", {
         params: { skip, limit },
     })
+    return response.data
+}
+
+export const getMedicineQuote = async ({
+    medicineId,
+    quantity,
+}: {
+    medicineId: number
+    quantity: number
+}): Promise<MedicineQuote> => {
+    const response = await api.get<MedicineQuote>(
+        `/api/v1/medicines/${medicineId}/quote`,
+        {
+            params: { quantity },
+        },
+    )
     return response.data
 }
 

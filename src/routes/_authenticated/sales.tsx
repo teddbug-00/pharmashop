@@ -105,7 +105,7 @@ export const Route = createFileRoute("/_authenticated/sales")({
 function SalesComponent() {
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ["sales"],
-        queryFn: () => getSales(),
+        queryFn: () => getSales(0, 100, "access"),
     })
 
     if (isError) {
