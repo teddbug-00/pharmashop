@@ -5,8 +5,8 @@ export const Route = createFileRoute("/_authenticated/_admin")({
         // Safely access the user from the potentially undefined auth context
         const user = context.auth?.user
 
-        // If the user doesn't exist or is not an admin, redirect
-        if (user?.role !== "admin") {
+        // If the user doesn't exist or is not an ADMIN, redirect
+        if (user?.role !== "ADMIN") { // Changed "admin" to "ADMIN"
             throw redirect({
                 to: "/",
             })

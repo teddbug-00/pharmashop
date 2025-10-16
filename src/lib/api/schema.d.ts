@@ -792,7 +792,7 @@ export interface components {
             refresh_token: string;
             /** Token Type */
             token_type: string;
-            user_role: components["schemas"]["UserRole"];
+            user: components["schemas"]["UserPublic"];
         };
         /** TopSellingProduct */
         TopSellingProduct: {

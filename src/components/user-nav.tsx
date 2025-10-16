@@ -10,15 +10,22 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useNavigate } from "@tanstack/react-router"
 
 export function UserNav() {
     const { user, logout } = useAuth()
+    const navigate = useNavigate() // Initialize useNavigate
 
     // Get the first two letters of the username for the avatar fallback
     const fallback =
         user?.username
-            .substring(0, 2)
+            ?.substring(0, 2) // Added optional chaining here
             .toUpperCase() || "AD"
+
+    const handleLogout = () => {
+        logout();
+        navigate({ to: "/login", replace: true }); // Redirect to login page after logout
+    };
 
     return (
         <DropdownMenu>
@@ -51,7 +58,7 @@ export function UserNav() {
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>
+                <DropdownMenuItem onClick={handleLogout}>
                     Log out
                 </DropdownMenuItem>
             </DropdownMenuContent>

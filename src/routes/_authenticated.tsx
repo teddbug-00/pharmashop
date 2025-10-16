@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_authenticated")({
 })
 
 function AuthenticatedLayout() {
+    console.log("AuthenticatedLayout component is rendering!"); // <--- ADD THIS LINE
     return (
         <div className="flex min-h-screen w-full flex-col">
             <header className="sticky top-0 z-40 w-full border-b bg-background">

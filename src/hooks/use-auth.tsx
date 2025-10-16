@@ -5,7 +5,6 @@ import { refreshAccessToken } from "@/lib/api/auth"
 import { jwtDecode } from "jwt-decode"
 
 type User = components["schemas"]["UserPublic"]
-type UserRole = components["schemas"]["UserRole"]
 
 interface AuthContextType {
     isAuthenticated: boolean
@@ -36,24 +35,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = React.useState<User | null>(null)
     const [isAuthenticated, setIsAuthenticated] = React.useState(false)
 
-    // Load tokens and user from localStorage on initial load
-    React.useEffect(() => {
-        const storedAccessToken = localStorage.getItem("accessToken")
-        const storedRefreshToken = localStorage.getItem("refreshToken")
-        const storedUser = localStorage.getItem("user")
-
-        if (storedAccessToken && storedRefreshToken && storedUser) {
-            setAccessToken(storedAccessToken)
-            setRefreshToken(storedRefreshToken)
-            setUser(JSON.parse(storedUser))
-            setIsAuthenticated(true)
-        }
-    }, [])
-
     const login = React.useCallback((newAccessToken: string, newRefreshToken: string, newUser: User) => {
         localStorage.setItem("accessToken", newAccessToken)
         localStorage.setItem("refreshToken", newRefreshToken)
         localStorage.setItem("user", JSON.stringify(newUser))
+
         setAccessToken(newAccessToken)
         setRefreshToken(newRefreshToken)
         setUser(newUser)
@@ -70,6 +56,38 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsAuthenticated(false)
     }, [])
 
+    // Load tokens and user from localStorage on initial load
+    React.useEffect(() => {
+        const storedAccessToken = localStorage.getItem("accessToken")
+        const storedRefreshToken = localStorage.getItem("refreshToken")
+        const storedUser = localStorage.getItem("user")
+
+        if (storedAccessToken && storedRefreshToken && storedUser) {
+            try {
+                const parsedUser = JSON.parse(storedUser);
+                setAccessToken(storedAccessToken)
+                setRefreshToken(storedRefreshToken)
+                setUser(parsedUser)
+                setIsAuthenticated(true)
+            } catch (e) {
+                console.error("AuthProvider: Error parsing stored user or tokens from localStorage. Clearing data.", e);
+                // Clear invalid data if parsing fails
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+                localStorage.removeItem("user");
+                setAccessToken(null);
+                setRefreshToken(null);
+                setUser(null);
+                setIsAuthenticated(false);
+            }
+        } else {
+            // If any part is missing, ensure all are cleared to prevent partial state
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            localStorage.removeItem("user");
+        }
+    }, [login, logout]) // Added login and logout to dependency array
+
     // Axios Interceptor for automatic token refresh
     React.useEffect(() => {
         const interceptor = api.interceptors.request.use(
@@ -81,21 +99,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 const decodedToken: { exp: number } = jwtDecode(accessToken)
                 const currentTime = Date.now() / 1000
 
-                // If token is expired and a refresh token exists
                 if (decodedToken.exp < currentTime && refreshToken) {
                     try {
                         const response = await refreshAccessToken(refreshToken)
                         const newAccessToken = response.access_token
                         const newRefreshToken = response.refresh_token
-                        const newUserRole = response.user_role
-
-                        // Construct a minimal UserPublic object for the updated user
-                        const newUser: User = {
-                            id: user?.id || 0, // Keep existing ID or use placeholder
-                            username: user?.username || "", // Keep existing username or use placeholder
-                            full_name: user?.full_name || "", // Keep existing full_name or use placeholder
-                            role: newUserRole,
-                        };
+                        const newUser = response.user; 
 
                         login(newAccessToken, newRefreshToken, newUser)
                         config.headers.Authorization = `Bearer ${newAccessToken}`

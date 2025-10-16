@@ -8,7 +8,7 @@ import { TanStackRouterDevtools } from "@tanstack/router-devtools"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { useAuth } from "@/hooks/use-auth"
-import { AuthProvider } from "@/contexts/auth-provider"
+import { AuthProvider } from "@/hooks/use-auth"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 
@@ -44,7 +44,7 @@ function RouterUpdater() {
     const auth = useAuth()
     const router = useRouter()
 
-    // Use an effect to update the router's context
+    // Use an effect to update the router\'s context
     React.useEffect(() => {
         router.update({
             context: {

@@ -1,4 +1,4 @@
-import {createFileRoute} from "@tanstack/react-router";
+import {createFileRoute, useNavigate, useSearch} from "@tanstack/react-router";
 import type { components } from "@/lib/api/schema"
 import { z } from "zod"
 import { useAuth } from "@/hooks/use-auth"
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import * as React from "react";
 
 type Token = components["schemas"]["Token"]
 type UserPublic = components["schemas"]["UserPublic"]
@@ -35,10 +36,16 @@ const formSchema = z.object({
 // Define the route
 export const Route = createFileRoute("/login")({
     component: LoginComponent,
+    // Add a search schema to capture the 'redirect' query parameter
+    validateSearch: z.object({
+        redirect: z.string().optional(),
+    }),
 })
 
 function LoginComponent() {
     const auth = useAuth()
+    const navigate = useNavigate() // Initialize useNavigate
+    const { redirect } = Route.useSearch() // Get the redirect parameter from the URL
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -63,18 +70,16 @@ function LoginComponent() {
             return res.data
         },
         onSuccess: (data) => {
-            // Construct a minimal UserPublic object from the login response
-            // Note: The login endpoint does not return full UserPublic details (id, full_name, username).
-            // We are using placeholder values for id and full_name, and the username from the form.
-            // In a more complete application, you might fetch full user details from a /users/me endpoint.
-            const userToLogin: UserPublic = {
-                id: 0, // Placeholder ID
-                username: form.getValues("username"),
-                full_name: form.getValues("username"), // Placeholder full_name
-                role: data.user_role,
-            }
+            console.log("Login onSuccess: API response data:", data); // Existing log
+            console.log("Login onSuccess: access_token from API:", data.access_token);
+            console.log("Login onSuccess: refresh_token from API:", data.refresh_token);
+            console.log("Login onSuccess: user from API:", data.user);
+            // The API now returns the full UserPublic object directly within the Token
+            const userToLogin: UserPublic = data.user;
 
             auth.login(data.access_token, data.refresh_token, userToLogin)
+
+            // Removed direct navigate call here
         },
         onError: (error) => {
             // You can handle login errors here, e.g., show a toast notification
@@ -84,6 +89,13 @@ function LoginComponent() {
             })
         },
     })
+
+    // Add a useEffect to navigate once authentication is confirmed
+    React.useEffect(() => {
+        if (auth.isAuthenticated) {
+            navigate({ to: redirect || '/', replace: true });
+        }
+    }, [auth.isAuthenticated, navigate, redirect]);
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         loginMutation.mutate(values)

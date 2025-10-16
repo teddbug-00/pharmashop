@@ -26,61 +26,57 @@ export function MainNav({
             <NavigationMenu className={cn("hidden md:flex", className)}>
                 <NavigationMenuList>
                     <NavigationMenuItem>
-                        <Link
-                            to="/"
-                            activeProps={{
-                                className: "bg-accent text-accent-foreground",
-                            }}
-                        >
-                            <NavigationMenuLink
-                                className={navigationMenuTriggerStyle()}
-                            >
-                                Dashboard
-                            </NavigationMenuLink>
-                        </Link>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem>
-                        <Link
-                            to="/medicines"
-                            activeProps={{
-                                className: "bg-accent text-accent-foreground",
-                            }}
-                        >
-                            <NavigationMenuLink
-                                className={navigationMenuTriggerStyle()}
-                            >
-                                Inventory
-                            </NavigationMenuLink>
-                        </Link>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem>
-                        <Link
-                            to="/sales"
-                            activeProps={{
-                                className: "bg-accent text-accent-foreground",
-                            }}
-                        >
-                            <NavigationMenuLink
-                                className={navigationMenuTriggerStyle()}
-                            >
-                                Sales
-                            </NavigationMenuLink>
-                        </Link>
-                    </NavigationMenuItem>
-                    {user?.role === "admin" && (
-                        <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
                             <Link
-                                to="/users"
+                                to="/"
+                                className={navigationMenuTriggerStyle()} // Apply style directly to Link
                                 activeProps={{
                                     className: "bg-accent text-accent-foreground",
                                 }}
                             >
-                                <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
+                                Dashboard
+                            </Link>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
+                            <Link
+                                to="/medicines"
+                                className={navigationMenuTriggerStyle()} // Apply style directly to Link
+                                activeProps={{
+                                    className: "bg-accent text-accent-foreground",
+                                }}
+                            >
+                                Inventory
+                            </Link>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
+                            <Link
+                                to="/sales"
+                                className={navigationMenuTriggerStyle()} // Apply style directly to Link
+                                activeProps={{
+                                    className: "bg-accent text-accent-foreground",
+                                }}
+                            >
+                                Sales
+                            </Link>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                    {user?.role === "ADMIN" && (
+                        <NavigationMenuItem>
+                            <NavigationMenuLink asChild>
+                                <Link
+                                    to="/users"
+                                    className={navigationMenuTriggerStyle()} // Apply style directly to Link
+                                    activeProps={{
+                                        className: "bg-accent text-accent-foreground",
+                                    }}
                                 >
                                     Users
-                                </NavigationMenuLink>
-                            </Link>
+                                </Link>
+                            </NavigationMenuLink>
                         </NavigationMenuItem>
                     )}
                 </NavigationMenuList>
