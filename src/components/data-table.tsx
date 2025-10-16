@@ -54,7 +54,13 @@ export function DataTable<TData extends { id: number | string }, TValue>({
         getFilteredRowModel: getFilteredRowModel(),
         onRowSelectionChange: setRowSelection,
         enableRowSelection: true,
-        getRowId: (row) => String(row.id), // Use the actual medicine ID as the row ID
+        getRowId: (row) => {
+            if (row.id === undefined) {
+                console.warn("Row ID is undefined in getRowId:", row);
+                return Math.random().toString(); // Provide a fallback unique ID
+            }
+            return String(row.id);
+        },
         state: {
             sorting,
             columnFilters,
@@ -100,14 +106,19 @@ export function DataTable<TData extends { id: number | string }, TValue>({
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
-                                    key={row.id}
+                                    key={row.id !== undefined ? String(row.id) : Math.random().toString()}
                                     data-state={row.getIsSelected() && "selected"}
                                 >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
+                                    {row.getVisibleCells().map((cell) => {
+                                        console.log("Inspecting cell:", cell);
+                                        console.log("Cell ID:", cell?.id);
+                                        const cellKey = cell?.id !== undefined ? String(cell.id) : Math.random().toString();
+                                        return (
+                                            <TableCell key={cellKey}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        );
+                                    })}
                                 </TableRow>
                             ))
                         ) : (
